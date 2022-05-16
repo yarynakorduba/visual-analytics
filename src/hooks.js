@@ -3,7 +3,7 @@ import { centroid, area } from "@turf/turf";
 import { GeoJsonLayer, TextLayer } from "@deck.gl/layers";
 
 import { scaleSequential } from "d3-scale";
-import { interpolateYlGn } from "d3-scale-chromatic";
+import { interpolatePuRd } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 
 import { getAvgLifeExpectancy } from "./utils";
@@ -30,14 +30,24 @@ export const useTextLayer = (data, year) => {
   }, []);
 
   const getText = useCallback(
-    (d) => {
+    (d, rest) => {
       const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      console.log("D -> ", d, rest);
+      const countryName = d.properties.ISO_A3;
       if ((avgLifeExpectancy || 0) <= 0) return "";
       const countryArea = area(d.geometry);
-      return countryArea > MIN_AREA_TEXT_SHOWN ? `${Math.round(avgLifeExpectancy)}y.` : "";
+      return countryArea > MIN_AREA_TEXT_SHOWN ? `${countryName} ${Math.round(avgLifeExpectancy)}y.` : "";
     },
     [year]
   );
+
+  const getColor = (d) => {
+    const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+
+    if (avgLifeExpectancy > 70) return [0, 0, 255, 255];
+    return [0, 0, 255, 255];
+  };
+
   const layer = useMemo(
     () =>
       data?.features &&
@@ -47,20 +57,21 @@ export const useTextLayer = (data, year) => {
         pickable: true,
         getPosition: getTextPosition,
         getText,
-        getSize: 16,
+        getSize: 10,
         getAngle: 0,
         getTextAnchor: "middle",
         getAlignmentBaseline: "center",
-        getColor: (d) => [255, 0, 0],
+        getColor,
+        background: true,
       }),
-    [data?.features, getText, getTextPosition]
+    [data?.features, getColor, getText, getTextPosition]
   );
   return layer;
 };
 
 const formatRGB = (rgb) => rgb.match(/\d+/g).map(Number);
 const getPolygon = (d) => d.geometry.coordinates;
-const colorScale = scaleSequential(interpolateYlGn).domain([30, 80]);
+const colorScale = scaleSequential(interpolatePuRd).domain([50, 90]);
 
 export const useGeojsonLayer = (data, year) => {
   const getFillColor = useCallback(
@@ -83,7 +94,7 @@ export const useGeojsonLayer = (data, year) => {
         id: "ground-layer",
         data,
         stroked: true,
-        getLineColor: [125, 125, 125, 255],
+        getLineColor: [255, 255, 255, 255],
         getLineWidth: 1,
         lineWidthScale: 2,
         lineWidthMinPixels: 0.5,
