@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { centroid, area } from "@turf/turf";
-import { GeoJsonLayer, TextLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
 
 import { scaleSequential } from "d3-scale";
-import { interpolatePuRd } from "d3-scale-chromatic";
+import { interpolatePuRd, interpolatePlasma } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 
 import { getAvgLifeExpectancy } from "./utils";
@@ -22,17 +22,14 @@ export const useDataset = () => {
 
   return [data, setData];
 };
-
+const getPosition = (d) => {
+  const countryCentroid = centroid(d.geometry);
+  return countryCentroid.geometry.coordinates;
+};
 export const useTextLayer = (data, year) => {
-  const getTextPosition = useCallback((d) => {
-    const countryCentroid = centroid(d.geometry);
-    return countryCentroid.geometry.coordinates;
-  }, []);
-
   const getText = useCallback(
-    (d, rest) => {
+    (d) => {
       const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
-      console.log("D -> ", d, rest);
       const countryName = d.properties.ISO_A3;
       if ((avgLifeExpectancy || 0) <= 0) return "";
       const countryArea = area(d.geometry);
@@ -41,12 +38,20 @@ export const useTextLayer = (data, year) => {
     [year]
   );
 
-  const getColor = (d) => {
-    const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+  const getColor = useCallback(
+    (d) => {
+      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      if (avgLifeExpectancy > 70) return [0, 0, 255, 255];
+      return [0, 0, 255, 255];
+    },
+    [year]
+  );
 
-    if (avgLifeExpectancy > 70) return [0, 0, 255, 255];
-    return [0, 0, 255, 255];
-  };
+  const getTextPosition = useCallback((d) => {
+    const position = getPosition(d);
+    console.log("ABCD", [position[0] - 10, position[1]]);
+    return [position[0] - 1, position[1] - 1];
+  }, []);
 
   const layer = useMemo(
     () =>
@@ -64,20 +69,20 @@ export const useTextLayer = (data, year) => {
         getColor,
         background: true,
       }),
-    [data?.features, getColor, getText, getTextPosition]
+    [data?.features, getColor, getTextPosition]
   );
   return layer;
 };
 
 const formatRGB = (rgb) => rgb.match(/\d+/g).map(Number);
 const getPolygon = (d) => d.geometry.coordinates;
-const colorScale = scaleSequential(interpolatePuRd).domain([50, 90]);
+const colorScale = (interpolation) => scaleSequential(interpolation).domain([50, 90]);
 
 export const useGeojsonLayer = (data, year) => {
   const getFillColor = useCallback(
     (d) => {
       const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
-      const color = colorScale(avgLifeExpectancy);
+      const color = colorScale(interpolatePuRd)(avgLifeExpectancy);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];
@@ -105,5 +110,82 @@ export const useGeojsonLayer = (data, year) => {
     [data, getFillColor]
   );
   if (!data?.features) return undefined;
+  return layer;
+};
+
+export const useColumnLayer = (data, year) => {
+  const getElevation = useCallback(
+    (d) => {
+      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      console.log("D -> ", avgLifeExpectancy * 50);
+
+      return avgLifeExpectancy * 500;
+    },
+    [year]
+  );
+
+  const getFillColor = useCallback(
+    (d) => {
+      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      const color = colorScale(interpolatePlasma)(avgLifeExpectancy);
+      console.log("what a fuck", color);
+      if (color.startsWith("#")) {
+        const { red, green, blue } = hexRgb(color);
+        return [red, green, blue];
+      } else {
+        return formatRGB(color);
+      }
+    },
+    [year]
+  );
+
+  const layer = useMemo(
+    () =>
+      new ColumnLayer({
+        id: "column-layer",
+        data: data?.features,
+
+        /* props from ColumnLayer class */
+
+        angle: -45,
+        coverage: 2,
+        diskResolution: 1000,
+        elevationScale: 50,
+        extruded: true,
+        // filled: true,
+        getElevation, //: getElevation(),
+        getFillColor,
+        // getLineColor: [0, 0, 0],
+        // getLineWidth: 200,
+        getPosition,
+        // lineWidthMaxPixels: Number.MAX_SAFE_INTEGER,
+        // lineWidthMinPixels: 0,
+        // lineWidthScale: 1,
+        // lineWidthUnits: 'meters',
+        material: false,
+        // offset: [0, 0],
+        radius: 25000,
+        // radiusUnits: 'meters',
+        stroked: false,
+        // vertices: null,
+        // wireframe: false,
+
+        /* props inherited from Layer class */
+
+        // autoHighlight: false,
+        // coordinateOrigin: [0, 0, 0],
+        // coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
+        highlightColor: [0, 0, 128, 128],
+        // modelMatrix: null,
+        // opacity: 1,
+        // pickable: true,
+        // visible: true,
+        // wrapLongitude: false,
+      }),
+    [data, getElevation]
+  );
+
+  if (!data?.features) return undefined;
+
   return layer;
 };

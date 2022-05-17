@@ -4,7 +4,7 @@ import DeckGL from "@deck.gl/react";
 import { LightingEffect, AmbientLight, _SunLight as SunLight } from "@deck.gl/core";
 
 import { MIN_YEAR, MAX_YEAR } from "./consts";
-import { useDataset, useGeojsonLayer, useTextLayer } from "./hooks";
+import { useColumnLayer, useDataset, useGeojsonLayer, useTextLayer } from "./hooks";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2RxbnJmIn0.e0TnDHhdtb5qz3pfPbAgmw"; // Set your mapbox token here
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
@@ -35,8 +35,9 @@ function WorldMap() {
   const [year, setYear] = useState(MAX_YEAR);
   const [data] = useDataset();
 
-  const textLayer = useTextLayer(data, year);
   const geoJsonLayer = useGeojsonLayer(data, year);
+  const textLayer = useTextLayer(data, year);
+  const columnLayer = useColumnLayer(data, year);
 
   const [effects] = useState(() => {
     const lightingEffect = new LightingEffect({ ambientLight, dirLight });
@@ -48,8 +49,9 @@ function WorldMap() {
     if (layer.id === "text-layer") return viewport.zoom > 2;
     return true;
   };
-
-  const layers = [geoJsonLayer, textLayer].filter((l) => l);
+  console.log("AAAA --> ", columnLayer);
+  const layers = [geoJsonLayer, textLayer, columnLayer].filter((l) => l);
+  console.log("AAAAA 000 /, ", layers);
   if (!data?.features) return "Loading...";
   return (
     <DeckGL
