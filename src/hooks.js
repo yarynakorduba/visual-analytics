@@ -157,7 +157,7 @@ export const useColumnLayer = (data, year) => {
         getElevation, //: getElevation(),
         getFillColor,
         // getLineColor: [0, 0, 0],
-        // getLineWidth: 200,
+        getLineWidth: 400,
         getPosition,
         // lineWidthMaxPixels: Number.MAX_SAFE_INTEGER,
         // lineWidthMinPixels: 0,
