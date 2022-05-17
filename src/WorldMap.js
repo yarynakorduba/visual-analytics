@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Map } from "react-map-gl";
 import DeckGL from "@deck.gl/react";
-import { LightingEffect, AmbientLight, _SunLight as SunLight } from "@deck.gl/core";
+import { LightingEffect, AmbientLight, _SunLight as SunLight, _GlobeView as GlobeView } from "@deck.gl/core";
 
 import { MIN_YEAR, MAX_YEAR } from "./consts";
 import { useColumnLayer, useDataset, useGeojsonLayer, useTextLayer } from "./hooks";
@@ -10,9 +10,9 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2R
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 
 const INITIAL_VIEW_STATE = {
-  latitude: 49.254,
-  longitude: 0.13,
-  zoom: 1.25,
+  latitude: 48.3,
+  longitude: 32.31,
+  zoom: 0.75,
   maxZoom: 16,
   pitch: 0,
   bearing: 0,
@@ -57,11 +57,14 @@ function WorldMap() {
     <DeckGL
       layers={layers}
       layerFilter={filterLayers}
-      effects={effects}
+      // effects={effects}
       initialViewState={INITIAL_VIEW_STATE}
       controller={true}
+      views={[new GlobeView({ width: "100%", x: "0%" })]}
     >
-      <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} />
+      {/* <GlobeView id="map" width="50%" controller={true}> */}
+      {/* <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} /> */}
+      {/* </GlobeView> */}
     </DeckGL>
   );
 }

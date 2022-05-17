@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState, useEffect } from "react";
 import { centroid, area } from "@turf/turf";
 import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
 
-import { scaleSequential } from "d3-scale";
-import { interpolatePuRd, interpolatePlasma } from "d3-scale-chromatic";
+import { scaleSequential, scaleLinear } from "d3-scale";
+import { interpolateGreens, interpolateInferno } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 
 import { getAvgLifeExpectancy } from "./utils";
@@ -82,7 +82,7 @@ export const useGeojsonLayer = (data, year) => {
   const getFillColor = useCallback(
     (d) => {
       const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
-      const color = colorScale(interpolatePuRd)(avgLifeExpectancy);
+      const color = colorScale(interpolateGreens)(avgLifeExpectancy);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];
@@ -113,13 +113,14 @@ export const useGeojsonLayer = (data, year) => {
   return layer;
 };
 
+const elevationScale = scaleLinear().range([50, 1000]).domain([50, 100]);
+
 export const useColumnLayer = (data, year) => {
   const getElevation = useCallback(
     (d) => {
       const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
-      console.log("D -> ", avgLifeExpectancy * 50);
 
-      return avgLifeExpectancy * 500;
+      return elevationScale(avgLifeExpectancy);
     },
     [year]
   );
@@ -127,7 +128,7 @@ export const useColumnLayer = (data, year) => {
   const getFillColor = useCallback(
     (d) => {
       const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
-      const color = colorScale(interpolatePlasma)(avgLifeExpectancy);
+      const color = colorScale(interpolateInferno)(avgLifeExpectancy);
       console.log("what a fuck", color);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
@@ -150,7 +151,7 @@ export const useColumnLayer = (data, year) => {
         angle: -45,
         coverage: 2,
         diskResolution: 1000,
-        elevationScale: 50,
+        elevationScale: 1000,
         extruded: true,
         // filled: true,
         getElevation, //: getElevation(),
@@ -177,12 +178,12 @@ export const useColumnLayer = (data, year) => {
         // coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
         highlightColor: [0, 0, 128, 128],
         // modelMatrix: null,
-        // opacity: 1,
+        opacity: 0.5,
         // pickable: true,
         // visible: true,
         // wrapLongitude: false,
       }),
-    [data, getElevation]
+    [data?.features, getElevation, getFillColor]
   );
 
   if (!data?.features) return undefined;
