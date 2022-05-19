@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
-import { centroid, area } from "@turf/turf";
+import { centroid, area, point } from "@turf/turf";
 import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
 
 import { scaleSequential, scaleLinear } from "d3-scale";
@@ -14,7 +14,9 @@ export const useDataset = () => {
   useEffect(() => {
     fetch("countryData.geojson")
       .then((resp) => {
-        return resp.json();
+        return resp.json().then((res) => {
+          return res.geojson;
+        });
       })
       .then(setData)
       .catch((err) => console.error("Could not load data", err)); // eslint-disable-line
@@ -23,8 +25,7 @@ export const useDataset = () => {
   return [data, setData];
 };
 const getPosition = (d) => {
-  const countryCentroid = centroid(d.geometry);
-  return countryCentroid.geometry.coordinates;
+  return point([d.properties.lon, d.properties.lat]).geometry.coordinates;
 };
 export const useTextLayer = (data, year) => {
   const getText = useCallback(
@@ -49,7 +50,6 @@ export const useTextLayer = (data, year) => {
 
   const getTextPosition = useCallback((d) => {
     const position = getPosition(d);
-    console.log("ABCD", [position[0] - 10, position[1]]);
     return [position[0] - 1, position[1] - 1];
   }, []);
 
@@ -129,7 +129,6 @@ export const useColumnLayer = (data, year) => {
     (d) => {
       const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
       const color = colorScale(interpolateInferno)(avgLifeExpectancy);
-      console.log("what a fuck", color);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];
