@@ -4,7 +4,7 @@ import DeckGL from "@deck.gl/react";
 import { LightingEffect, AmbientLight, _SunLight as SunLight, _GlobeView as GlobeView } from "@deck.gl/core";
 
 import { MIN_YEAR, MAX_YEAR } from "./consts";
-import { useColumnLayer, useDataset, useGeojsonLayer, useTextLayer } from "./hooks";
+import { useColLifeExpAllLayer, useColLifeExpMaleLayer, useColLifeExpFemaleLayer, useDataset, useGeojsonLayer, useTextLayer } from "./hooks";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2RxbnJmIn0.e0TnDHhdtb5qz3pfPbAgmw"; // Set your mapbox token here
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
@@ -12,8 +12,8 @@ const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/s
 const INITIAL_VIEW_STATE = {
   latitude: 48.3,
   longitude: 32.31,
-  zoom: 0.75,
-  maxZoom: 16,
+  zoom: 2,
+  maxZoom: 6,
   pitch: 0,
   bearing: 0,
 };
@@ -37,7 +37,9 @@ function WorldMap() {
 
   const geoJsonLayer = useGeojsonLayer(data, year);
   const textLayer = useTextLayer(data, year);
-  const columnLayer = useColumnLayer(data, year);
+  const colLifeExpAll = useColLifeExpAllLayer(data, year);
+  const colLifeExpMale = useColLifeExpMaleLayer(data, year);
+  const colLifeExpFemale = useColLifeExpFemaleLayer(data, year);
 
   const [effects] = useState(() => {
     const lightingEffect = new LightingEffect({ ambientLight, dirLight });
@@ -47,10 +49,13 @@ function WorldMap() {
 
   const filterLayers = ({ layer, viewport }) => {
     if (layer.id === "text-layer") return viewport.zoom > 2;
+    if (layer.id === "colLifeExpAll") return viewport.zoom < 4;
+    if (layer.id === "colLifeExpMale") return viewport.zoom > 4 && viewport.zoom < 6;
+    if (layer.id === "colLifeExpFemale") return viewport.zoom > 4 && viewport.zoom < 6;
     return true;
   };
-  console.log("AAAA --> ", columnLayer);
-  const layers = [geoJsonLayer, textLayer, columnLayer].filter((l) => l);
+  console.log("AAAA --> ", colLifeExpAll);
+  const layers = [geoJsonLayer, textLayer, colLifeExpAll, colLifeExpMale, colLifeExpFemale].filter((l) => l);
   console.log("AAAAA 000 /, ", layers);
   if (!data?.features) return "Loading...";
   return (
@@ -60,10 +65,10 @@ function WorldMap() {
       // effects={effects}
       initialViewState={INITIAL_VIEW_STATE}
       controller={true}
-      views={[new GlobeView({ width: "100%", x: "0%" })]}
+      // views={[new GlobeView({ width: "100%", x: "0%" })]}
     >
       {/* <GlobeView id="map" width="50%" controller={true}> */}
-      {/* <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} /> */}
+      <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} />
       {/* </GlobeView> */}
     </DeckGL>
   );
