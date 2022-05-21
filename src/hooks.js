@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
-import { centroid, area, point } from "@turf/turf";
+import { area, point } from "@turf/turf";
 import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
 
 import { scaleSequential, scaleLinear } from "d3-scale";
 import { interpolateGreens, interpolateInferno } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 
-import { getAvgLifeExpectancy } from "./utils";
+import { getLifeExpAll } from "./utils";
 import { MIN_AREA_TEXT_SHOWN } from "./consts";
 
 export const useDataset = () => {
@@ -30,7 +30,7 @@ const getPosition = (d) => {
 export const useTextLayer = (data, year) => {
   const getText = useCallback(
     (d) => {
-      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      const avgLifeExpectancy = getLifeExpAll(year)(d);
       const countryName = d.properties.ISO_A3;
       if ((avgLifeExpectancy || 0) <= 0) return "";
       const countryArea = area(d.geometry);
@@ -41,7 +41,7 @@ export const useTextLayer = (data, year) => {
 
   const getColor = useCallback(
     (d) => {
-      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      const avgLifeExpectancy = getLifeExpAll(year)(d);
       if (avgLifeExpectancy > 70) return [0, 0, 255, 255];
       return [0, 0, 255, 255];
     },
@@ -81,7 +81,7 @@ const colorScale = (interpolation) => scaleSequential(interpolation).domain([50,
 export const useGeojsonLayer = (data, year) => {
   const getFillColor = useCallback(
     (d) => {
-      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      const avgLifeExpectancy = getLifeExpAll(year)(d);
       const color = colorScale(interpolateGreens)(avgLifeExpectancy);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
@@ -118,7 +118,7 @@ const elevationScale = scaleLinear().range([50, 1000]).domain([50, 100]);
 export const useColumnLayer = (data, year) => {
   const getElevation = useCallback(
     (d) => {
-      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      const avgLifeExpectancy = getLifeExpAll(year)(d);
 
       return elevationScale(avgLifeExpectancy);
     },
@@ -127,7 +127,7 @@ export const useColumnLayer = (data, year) => {
 
   const getFillColor = useCallback(
     (d) => {
-      const avgLifeExpectancy = getAvgLifeExpectancy(year)(d);
+      const avgLifeExpectancy = getLifeExpAll(year)(d);
       const color = colorScale(interpolateInferno)(avgLifeExpectancy);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
