@@ -49,9 +49,7 @@ function WorldMap() {
     if (layer.id === "text-layer") return viewport.zoom > 2;
     return true;
   };
-  console.log("AAAA --> ", columnLayer);
   const layers = [geoJsonLayer, textLayer, columnLayer].filter((l) => l);
-  console.log("AAAAA 000 /, ", layers);
   if (!data?.features) return "Loading...";
   return (
     <DeckGL
