@@ -1,9 +1,13 @@
 .Pill {
-  padding: 0.25em;
-  &--men {
-    background: blue;
+  padding: 0.25em 0.5em;
+  margin: 0 0.5em;
+  display: inline-block;
+  border-radius: 7px;
+  box-shadow: 8px 8px 15px -8px rgba(0, 0, 0, 0.34);
+  &--male {
+    background: rgba(60, 60, 231, 0.331);
   }
-  &--women {
-    background: fuchsia;
+  &--female {
+    background: rgba(248, 79, 248, 0.304);
   }
 }

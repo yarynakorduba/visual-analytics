@@ -1,7 +1,7 @@
 import React from "react";
 import { getLifeExpFemale, getLifeExpMale } from "../utils";
 
-import Pill from "../Pill";
+import Pill, { PillVariant } from "../Pill";
 
 import "./InfoPopup.scss";
 
@@ -13,8 +13,8 @@ const InfoPopup = ({ year, country }) => {
   return (
     <div className="InfoPopup">
       <h2>{name}</h2>
-      <Pill>{maleLifeExpectancy} years</Pill>
-      <Pill>{femaleLifeExpectancy} years</Pill>
+      <Pill variant={PillVariant.male}>{maleLifeExpectancy} years</Pill>
+      <Pill variant={PillVariant.female}>{femaleLifeExpectancy} years</Pill>
     </div>
   );
 };
