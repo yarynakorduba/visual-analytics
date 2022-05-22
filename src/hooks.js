@@ -81,6 +81,7 @@ export const useTextLifeExpAllLayer = (data, year) => {
         getColor,
         background: true,
         billboard: false,
+        backgroundColor: [255, 255, 255, 100],
         fontSettings: {
           sdf: true,
           radius: 80,

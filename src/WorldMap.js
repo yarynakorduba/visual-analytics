@@ -73,17 +73,8 @@ function WorldMap() {
   if (!data?.features) return "Loading...";
   return (
     <div>
-      <DeckGL
-        layers={layers}
-        layerFilter={filterLayers}
-        // effects={effects}
-        initialViewState={INITIAL_VIEW_STATE}
-        controller={true}
-        // views={[new GlobeView({ width: "100%", x: "0%" })]}
-      >
-        {/* <GlobeView id="map" width="50%" controller={true}> */}
+      <DeckGL layers={layers} layerFilter={filterLayers} initialViewState={INITIAL_VIEW_STATE} controller={true}>
         <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} />
-        {/* </GlobeView> */}
       </DeckGL>
       {selectedCountry && <InfoPopup country={selectedCountry} year={year} />}
     </div>
