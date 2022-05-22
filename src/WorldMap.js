@@ -10,7 +10,8 @@ import {
   useColLifeExpFemaleLayer,
   useDataset,
   useGeojsonLayer,
-  useTextLayer,
+  useTextLifeExpAllLayer,
+  useTextLifeExpGenderLayer
 } from "./hooks";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2RxbnJmIn0.e0TnDHhdtb5qz3pfPbAgmw"; // Set your mapbox token here
@@ -43,7 +44,8 @@ function WorldMap() {
   const [data] = useDataset();
 
   const geoJsonLayer = useGeojsonLayer(data, year);
-  const textLayer = useTextLayer(data, year);
+  const textLifeExpAll = useTextLifeExpAllLayer(data, year);
+  const textLifeExpGender = useTextLifeExpGenderLayer(data, year);
   const colLifeExpAll = useColLifeExpAllLayer(data, year);
   const colLifeExpMale = useColLifeExpMaleLayer(data, year);
   const colLifeExpFemale = useColLifeExpFemaleLayer(data, year);
@@ -55,13 +57,14 @@ function WorldMap() {
   });
 
   const filterLayers = ({ layer, viewport }) => {
-    if (layer.id === "text-layer") return viewport.zoom > 2;
+    if (layer.id === "textLifeExpAll") return viewport.zoom < 4;
+    if (layer.id === "textLifeExpGender") return viewport.zoom > 4 && viewport.zoom < 6;
     if (layer.id === "colLifeExpAll") return viewport.zoom < 4;
     if (layer.id === "colLifeExpMale") return viewport.zoom > 4 && viewport.zoom < 6;
     if (layer.id === "colLifeExpFemale") return viewport.zoom > 4 && viewport.zoom < 6;
     return true;
   };
-  const layers = [geoJsonLayer, textLayer, colLifeExpAll, colLifeExpMale, colLifeExpFemale].filter((l) => l);
+  const layers = [geoJsonLayer, textLifeExpAll, textLifeExpGender, colLifeExpAll, colLifeExpMale, colLifeExpFemale].filter((l) => l);
   if (!data?.features) return "Loading...";
   return (
     <DeckGL
@@ -70,10 +73,10 @@ function WorldMap() {
       // effects={effects}
       initialViewState={INITIAL_VIEW_STATE}
       controller={true}
-      views={[new GlobeView({ width: "100%", x: "0%" })]}
+      // views={[new GlobeView({ width: "100%", x: "0%" })]}
     >
       {/* <GlobeView id="map" width="50%" controller={true}> */}
-      {/* <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} /> */}
+      <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} />
       {/* </GlobeView> */}
     </DeckGL>
   );

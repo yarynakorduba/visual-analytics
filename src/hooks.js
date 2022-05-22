@@ -29,16 +29,15 @@ const getPosition = (d) => {
   return point([d.properties.lon, d.properties.lat]).geometry.coordinates;
 };
 
-// MAIN TEXT LAYER
-export const useTextLayer = (data, year) => {
+// LIFEEXPALL TEXT LAYER
+export const useTextLifeExpAllLayer = (data, year) => {
   const getText = useCallback(
     (d) => {
-      const lifeExpMale = getLifeExpMale(year)(d);
-      const lifeExpFemale = getLifeExpFemale(year)(d);
-      if (((lifeExpMale && lifeExpFemale) || 0) <= 0) return "";
+      const lifeExpAll = getLifeExpAll(year)(d);
+      if (((lifeExpAll) || 0) <= 0) return "";
       const countryCode = d.properties.ISO_A3;
       const countryArea = area(d.geometry);
-      return countryArea > MIN_AREA_TEXT_SHOWN ? `${countryCode} \n M ${Math.round(lifeExpMale)}y. | F ${Math.round(lifeExpFemale)}y.` : "";
+      return countryArea > MIN_AREA_TEXT_SHOWN ? `${countryCode} | ${Math.round(lifeExpAll)}y.` : "";
     }, [year]
   );
 
@@ -59,7 +58,60 @@ export const useTextLayer = (data, year) => {
     () =>
       data?.features &&
       new TextLayer({
-        id: "text-layer",
+        id: "textLifeExpAll",
+        data: data?.features,
+        pickable: true,
+        getPosition: getTextPosition,
+        getText,
+        getSize: 8,
+        getAngle: 0,
+        getTextAnchor: "middle",
+        getAlignmentBaseline: "center",
+        getColor,
+        background: true,
+        billboard: false,
+        fontSettings: {
+          sdf: true,
+          radius: 80,
+          cutoff: 0.23
+        }
+      }),
+    [data?.features, getColor, getTextPosition]
+  );
+  return layer;
+};
+
+// LIFEEXPALL TEXT LAYER
+export const useTextLifeExpGenderLayer = (data, year) => {
+  const getText = useCallback(
+    (d) => {
+      const lifeExpMale = getLifeExpMale(year)(d);
+      const lifeExpFemale = getLifeExpFemale(year)(d);
+      if (((lifeExpMale && lifeExpFemale) || 0) <= 0) return "";
+      const countryCode = d.properties.ISO_A3;
+      const countryArea = area(d.geometry);
+      return `${countryCode} \n M ${Math.round(lifeExpMale)}y.|F ${Math.round(lifeExpFemale)}y.`;
+    }, [year]
+  );
+
+  const getColor = useCallback((d) => {
+      const avgLifeExpectancy = getLifeExpAll(year)(d);
+      if (avgLifeExpectancy > 70) return [0, 0, 255, 255];
+      return [0, 0, 255, 255];
+    }, [year]
+  );
+
+  const getTextPosition = useCallback((d) => {
+      const position = getPosition(d);
+      return [position[0], position[1] - 1.5];
+    }, []
+  );
+
+  const layer = useMemo(
+    () =>
+      data?.features &&
+      new TextLayer({
+        id: "textLifeExpGender",
         data: data?.features,
         pickable: true,
         getPosition: getTextPosition,
@@ -69,7 +121,13 @@ export const useTextLayer = (data, year) => {
         getTextAnchor: "middle",
         getAlignmentBaseline: "center",
         getColor,
-        background: true
+        background: true,
+        billboard: false,
+        fontSettings: {
+          sdf: true,
+          radius: 80,
+          cutoff: 0.23
+        }
       }),
     [data?.features, getColor, getTextPosition]
   );
@@ -165,7 +223,7 @@ export const useColLifeExpAllLayer = (data, year) => {
         radius: 25000,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 1,
+        opacity: 0.5,
       }),
     [data?.features, getElevation, getFillColor]
   );
@@ -226,7 +284,7 @@ export const useColLifeExpMaleLayer = (data, year) => {
         radius: 20000,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 1,
+        opacity: 0.5,
       }),
     [data?.features, getElevation, getFillColor, getColPosition]
   );
@@ -287,7 +345,7 @@ export const useColLifeExpFemaleLayer = (data, year) => {
         radius: 20000,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 1,
+        opacity: 0.5,
       }),
     [data?.features, getElevation, getFillColor, getColPosition]
   );
