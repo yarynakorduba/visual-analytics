@@ -1,0 +1,9 @@
+.Pill {
+  padding: 0.25em;
+  &--men {
+    background: blue;
+  }
+  &--women {
+    background: fuchsia;
+  }
+}

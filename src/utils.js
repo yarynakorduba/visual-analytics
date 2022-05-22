@@ -21,7 +21,8 @@ export const getLifeExpFemale = (displayedYear) => (d) => {
 
 // LIFEEXPMALE
 export const getLifeExpMale = (displayedYear) => (d) => {
-  const { lifeExpMale } = d.properties;
+  console.log("!!!!! > ", d.properties);
+  const { lifeExpMale } = d?.properties;
   if (!lifeExpMale) return [255, 255, 255];
   return lifeExpMale?.[getYearIdx(displayedYear)];
 };
