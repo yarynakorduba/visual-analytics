@@ -3,10 +3,9 @@ import { useTooltipInPortal } from "@visx/tooltip";
 import { area, point } from "@turf/turf";
 import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
 import { scaleSequential, scaleLinear } from "d3-scale";
-import { interpolateGreens, interpolateInferno, interpolateBlues, interpolatePurples } from "d3-scale-chromatic";
+import { interpolateGreens, interpolateInferno, interpolateBlues, interpolatePuRd } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 import { isNil } from "lodash";
-
 import {
   getLifeExpAll,
   getLifeExpFemale,
@@ -71,16 +70,15 @@ export const useTextLifeExpAllLayer = (data, year) => {
       new TextLayer({
         id: "textLifeExpAll",
         data: data?.features,
-        pickable: true,
         getPosition: getTextPosition,
         getText,
-        getSize: 8,
+        getSize: 12,
         getAngle: 0,
         getTextAnchor: "middle",
-        getAlignmentBaseline: "center",
+        getAlignmentBaseline: "bottom",
         getColor,
         background: true,
-        billboard: false,
+        billboard: true,
         backgroundColor: [255, 255, 255, 100],
         fontSettings: {
           sdf: true,
@@ -94,7 +92,7 @@ export const useTextLifeExpAllLayer = (data, year) => {
 };
 
 // LIFEEXPALL TEXT LAYER
-export const useTextLifeExpGenderLayer = (data, year) => {
+export const useTextLifeExpGenderLayer = (data, year, layerId, offset, size) => {
   const getText = useCallback(
     (d) => {
       const lifeExpMale = getLifeExpMale(year)(d);
@@ -118,25 +116,25 @@ export const useTextLifeExpGenderLayer = (data, year) => {
 
   const getTextPosition = useCallback((d) => {
     const position = getPosition(d);
-    return [position[0], position[1] - 2];
+    return [position[0], position[1] - offset];
   }, []);
+
 
   const layer = useMemo(
     () =>
       data?.features &&
       new TextLayer({
-        id: "textLifeExpGender",
+        id: layerId,
         data: data?.features,
-        pickable: true,
         getPosition: getTextPosition,
         getText,
-        getSize: 10,
+        getSize: size,
         getAngle: 0,
         getTextAnchor: "middle",
-        getAlignmentBaseline: "center",
+        getAlignmentBaseline: "bottom",
         getColor,
         background: true,
-        billboard: false,
+        billboard: true,
         backgroundColor: [255, 255, 255, 100],
         fontSettings: {
           sdf: true,
@@ -151,7 +149,7 @@ export const useTextLifeExpGenderLayer = (data, year) => {
 
 const formatRGB = (rgb) => rgb.match(/\d+/g).map(Number);
 const getPolygon = (d) => d.geometry.coordinates;
-const colorScale = (interpolation) => scaleSequential(interpolation).domain([50, 90]);
+const colorScale = (interpolation) => scaleSequential(interpolation).domain([35, 90]);
 
 // GROUND LAYER
 export const useGeojsonLayer = (data, year, onSelect) => {
@@ -193,7 +191,7 @@ export const useGeojsonLayer = (data, year, onSelect) => {
   return layer;
 };
 
-const elevationScale = scaleLinear().range([50, 1000]).domain([50, 100]);
+const elevationScale = scaleLinear().range([200, 600]).domain([50, 100]);
 
 // LIFE EXP ALL
 export const useColLifeExpAllLayer = (data, year) => {
@@ -242,6 +240,7 @@ export const useColLifeExpAllLayer = (data, year) => {
         stroked: false,
         highlightColor: [0, 0, 128, 128],
         opacity: 0.5,
+        pickable:true,
       }),
     [data?.features, getElevation, getFillColor]
   );
@@ -251,20 +250,22 @@ export const useColLifeExpAllLayer = (data, year) => {
   return layer;
 };
 
-export const useColLifeExpMaleLayer = (data, year) => {
+export const useColLifeExpMaleLayer = (data, year, layerId ,radius, heightMultiplier, middleOffset) => {
   const getElevation = useCallback(
     (d) => {
       const lifeExp = getLifeExpMale(year)(d);
 
-      return elevationScale(lifeExp);
+      return elevationScale(lifeExp)*heightMultiplier;
     },
     [year]
   );
 
   const getColPosition = useCallback((d) => {
     const position = getPosition(d);
-    return [position[0] - 0.5, position[1]];
-  }, []);
+    return [position[0] + middleOffset, position[1]];
+  }, []
+);
+
 
   const getFillColor = useCallback(
     (d) => {
@@ -283,7 +284,7 @@ export const useColLifeExpMaleLayer = (data, year) => {
   const layer = useMemo(
     () =>
       new ColumnLayer({
-        id: "colLifeExpMale",
+        id: layerId,
         data: data?.features,
 
         /* props from ColumnLayer class */
@@ -298,10 +299,11 @@ export const useColLifeExpMaleLayer = (data, year) => {
         getLineWidth: 400,
         getPosition: getColPosition,
         material: false,
-        radius: 20000,
+        radius: radius,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 0.5,
+        opacity: 0.75,
+        pickable:true,
       }),
     [data?.features, getElevation, getFillColor, getColPosition]
   );
@@ -311,25 +313,26 @@ export const useColLifeExpMaleLayer = (data, year) => {
   return layer;
 };
 
-export const useColLifeExpFemaleLayer = (data, year) => {
+export const useColLifeExpFemaleLayer = (data, year, layerId ,radius, heightMultiplier, middleOffset) => {
   const getElevation = useCallback(
     (d) => {
       const lifeExp = getLifeExpFemale(year)(d);
 
-      return elevationScale(lifeExp);
+      return elevationScale(lifeExp)*heightMultiplier;
     },
     [year]
   );
 
   const getColPosition = useCallback((d) => {
     const position = getPosition(d);
-    return [position[0] + 0.5, position[1]];
-  }, []);
+    return [position[0] + middleOffset, position[1]];
+  }, []
+);
 
   const getFillColor = useCallback(
     (d) => {
-      const lifeExp = getLifeExpMale(year)(d);
-      const color = colorScale(interpolatePurples)(lifeExp);
+      const lifeExp = getLifeExpFemale(year)(d);
+      const color = colorScale(interpolatePuRd)(lifeExp);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];
@@ -343,7 +346,7 @@ export const useColLifeExpFemaleLayer = (data, year) => {
   const layer = useMemo(
     () =>
       new ColumnLayer({
-        id: "colLifeExpFemale",
+        id: layerId,
         data: data?.features,
 
         /* props from ColumnLayer class */
@@ -358,10 +361,11 @@ export const useColLifeExpFemaleLayer = (data, year) => {
         getLineWidth: 400,
         getPosition: getColPosition,
         material: false,
-        radius: 20000,
+        radius: radius,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 0.5,
+        opacity: 0.75,
+        pickable:true,
       }),
     [data?.features, getElevation, getFillColor, getColPosition]
   );
