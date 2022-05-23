@@ -15,7 +15,7 @@ import { useTooltipConfigs } from "../hooks";
 import { formatAxisTick, getAxisTickLabelProps, getLinearScale } from "../utils";
 import { ChartVariant, AxisVariant } from "../consts";
 
-const CHART_X_PADDING = 110;
+const CHART_X_PADDING = 80;
 const CHART_Y_PADDING = 24;
 
 const GRAY = "#E1E5EA";

@@ -15,13 +15,13 @@ import {
   getLinearScale,
   getInvertedBandScaleValue,
 } from "./utils";
-import { MIN_AREA_TEXT_SHOWN, ChartVariant } from "./consts";
+import { MIN_AREA_TEXT_SHOWN, GRAY } from "./consts";
 
 // DATASET
 export const useDataset = () => {
   const [data, setData] = useState();
   useEffect(() => {
-    fetch("countryData.geojson")
+    fetch(process.env.PUBLIC_URL + "/countryData.geojson")
       .then((resp) => {
         return resp.json().then((res) => {
           return res.geojson;
@@ -119,7 +119,6 @@ export const useTextLifeExpGenderLayer = (data, year, layerId, offset, size) => 
     return [position[0], position[1] - offset];
   }, []);
 
-
   const layer = useMemo(
     () =>
       data?.features &&
@@ -156,6 +155,7 @@ export const useGeojsonLayer = (data, year, onSelect) => {
   const getFillColor = useCallback(
     (d) => {
       const value = getImmunRateDpt(year)(d);
+      if (value === -1) return GRAY;
       const color = colorScale(interpolateGreens)(value);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
@@ -239,8 +239,8 @@ export const useColLifeExpAllLayer = (data, year) => {
         radius: 25000,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 0.5,
-        pickable:true,
+        opacity: 0.35,
+        pickable: true,
       }),
     [data?.features, getElevation, getFillColor]
   );
@@ -250,12 +250,12 @@ export const useColLifeExpAllLayer = (data, year) => {
   return layer;
 };
 
-export const useColLifeExpMaleLayer = (data, year, layerId ,radius, heightMultiplier, middleOffset) => {
+export const useColLifeExpMaleLayer = (data, year, layerId, radius, heightMultiplier, middleOffset) => {
   const getElevation = useCallback(
     (d) => {
       const lifeExp = getLifeExpMale(year)(d);
 
-      return elevationScale(lifeExp)*heightMultiplier;
+      return elevationScale(lifeExp) * heightMultiplier;
     },
     [year]
   );
@@ -263,9 +263,7 @@ export const useColLifeExpMaleLayer = (data, year, layerId ,radius, heightMultip
   const getColPosition = useCallback((d) => {
     const position = getPosition(d);
     return [position[0] + middleOffset, position[1]];
-  }, []
-);
-
+  }, []);
 
   const getFillColor = useCallback(
     (d) => {
@@ -302,8 +300,8 @@ export const useColLifeExpMaleLayer = (data, year, layerId ,radius, heightMultip
         radius: radius,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 0.75,
-        pickable:true,
+        opacity: 0.5,
+        pickable: true,
       }),
     [data?.features, getElevation, getFillColor, getColPosition]
   );
@@ -313,12 +311,12 @@ export const useColLifeExpMaleLayer = (data, year, layerId ,radius, heightMultip
   return layer;
 };
 
-export const useColLifeExpFemaleLayer = (data, year, layerId ,radius, heightMultiplier, middleOffset) => {
+export const useColLifeExpFemaleLayer = (data, year, layerId, radius, heightMultiplier, middleOffset) => {
   const getElevation = useCallback(
     (d) => {
       const lifeExp = getLifeExpFemale(year)(d);
 
-      return elevationScale(lifeExp)*heightMultiplier;
+      return elevationScale(lifeExp) * heightMultiplier;
     },
     [year]
   );
@@ -326,8 +324,7 @@ export const useColLifeExpFemaleLayer = (data, year, layerId ,radius, heightMult
   const getColPosition = useCallback((d) => {
     const position = getPosition(d);
     return [position[0] + middleOffset, position[1]];
-  }, []
-);
+  }, []);
 
   const getFillColor = useCallback(
     (d) => {
@@ -364,8 +361,8 @@ export const useColLifeExpFemaleLayer = (data, year, layerId ,radius, heightMult
         radius: radius,
         stroked: false,
         highlightColor: [0, 0, 128, 128],
-        opacity: 0.75,
-        pickable:true,
+        opacity: 0.5,
+        pickable: true,
       }),
     [data?.features, getElevation, getFillColor, getColPosition]
   );

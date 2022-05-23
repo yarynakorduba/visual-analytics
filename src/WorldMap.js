@@ -20,16 +20,16 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2R
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 
 const INITIAL_VIEW_STATE = {
-  latitude: 28.3,
-  longitude: 22.31,
-  zoom: 1,
+  latitude: 10.3,
+  longitude: 18.31,
+  zoom: 2,
   minZoom: 2,
   maxZoom: 8,
-  pitch: 40,
+  pitch: 45,
   bearing: 0,
   maxPitch: 60,
   minPitch: 20,
-  
+
   width: "100vw",
   height: "100vh",
 };
@@ -50,8 +50,8 @@ function WorldMap() {
   const colLifeExpMale = useColLifeExpMaleLayer(data, year, "colLifeExpMale", 15000, 0.5, -0.5);
   const colLifeExpMaleClose = useColLifeExpMaleLayer(data, year, "colLifeExpMaleClose", 7500, 0.1, -0.2);
 
-  const colLifeExpFemale = useColLifeExpFemaleLayer(data, year, "colLifeExpFemale" , 15000, 0.5, 0.5);
-  const colLifeExpFemaleClose = useColLifeExpFemaleLayer(data, year, "colLifeExpFemaleClose" , 7500, 0.1, 0.2);
+  const colLifeExpFemale = useColLifeExpFemaleLayer(data, year, "colLifeExpFemale", 15000, 0.5, 0.5);
+  const colLifeExpFemaleClose = useColLifeExpFemaleLayer(data, year, "colLifeExpFemaleClose", 7500, 0.1, 0.2);
 
   const onViewStateChange = ({ viewState, oldViewState, ...rest }) => {
     if (Math.abs(viewState?.longitude - oldViewState?.longitude) > 80) {
@@ -63,22 +63,17 @@ function WorldMap() {
   };
 
   const displayTooltip = (info) => {
+    if (!info || !info.object) return undefined;
 
-    if(!info || !info.object)
-      return undefined;
+    if (info.layer?.id === "colLifeExpFemale") return `Female: ${Math.round(getLifeExpFemale(year)(info.object))}y.`;
 
-    if(info.layer?.id === 'colLifeExpFemale')
-      return `Female: ${Math.round(getLifeExpFemale(year)(info.object))}y.`;
+    if (info.layer?.id === "colLifeExpMale") return `Male: ${Math.round(getLifeExpMale(year)(info.object))}y.`;
 
-    if(info.layer?.id === 'colLifeExpMale')
-    return `Male: ${Math.round(getLifeExpMale(year)(info.object))}y.`;
-    
-    if(info.layer?.id === 'colLifeExpAll')
-    return `Avg: ${Math.round(getLifeExpAll(year)(info.object))}y.`;
-  }
+    if (info.layer?.id === "colLifeExpAll") return `Avg: ${Math.round(getLifeExpAll(year)(info.object))}y.`;
+  };
 
   const filterLayers = ({ layer, viewport }) => {
-    if (layer.id === "textLifeExpAll") return viewport.zoom < 4;
+    if (layer.id === "textLifeExpAll") return viewport.zoom > 3 && viewport.zoom <= 4;
     if (layer.id === "textLifeExpGender") return viewport.zoom > 4 && viewport.zoom <= 6;
     if (layer.id === "textLifeExpGenderClose") return viewport.zoom > 6 && viewport.zoom <= 8;
 
@@ -100,18 +95,23 @@ function WorldMap() {
     colLifeExpAll,
     colLifeExpMale,
     colLifeExpFemale,
-    colLifeExpFemaleClose, 
-    colLifeExpMaleClose
+    colLifeExpFemaleClose,
+    colLifeExpMaleClose,
   ].filter((l) => l);
   if (!data?.features) return "Loading...";
   return (
     <div>
-      <DeckGL layers={layers} layerFilter={filterLayers} initialViewState={INITIAL_VIEW_STATE} controller={true} getTooltip={displayTooltip}>
+      <DeckGL
+        layers={layers}
+        layerFilter={filterLayers}
+        initialViewState={INITIAL_VIEW_STATE}
+        controller={true}
+        getTooltip={displayTooltip}
+      >
         <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} />
       </DeckGL>
       {selectedCountry && <InfoPopup country={selectedCountry} year={year} />}
     </div>
-
   );
 }
 

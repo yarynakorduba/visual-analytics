@@ -4,7 +4,7 @@ import { isNil, map } from "lodash";
 
 const pointTooltipStyles = {
   ...defaultStyles,
-  minWidth: "5rem",
+  minWidth: "2rem",
   maxWidth: "20rem",
   textAlign: "center",
   pointerEvents: "none",
@@ -12,7 +12,7 @@ const pointTooltipStyles = {
 
 const xAxisTooltipStyles = {
   ...defaultStyles,
-  minWidth: "5rem",
+  minWidth: "2rem",
   maxWidth: "7rem",
   textAlign: "center",
   pointerEvents: "none",
@@ -23,7 +23,7 @@ const xAxisTooltipStyles = {
 
 const yAxisTooltipStyles = {
   ...defaultStyles,
-  minWidth: "5rem",
+  minWidth: "2rem",
   maxWidth: "7rem",
   width: "fit-content",
   textAlign: "center",

@@ -10,3 +10,6 @@ export const AxisVariant = {
   left: "left",
   bottom: "bottom",
 };
+
+// colors
+export const GRAY = [169, 169, 169];
