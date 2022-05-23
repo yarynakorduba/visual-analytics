@@ -7,7 +7,7 @@ import Pill, { PillVariant } from "../Pill";
 import { MIN_YEAR } from "../consts";
 
 import "./InfoPopup.scss";
-
+//
 const formatXScale = Math.round;
 const formatYScale = Math.round;
 
