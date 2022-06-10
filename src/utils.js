@@ -52,7 +52,40 @@ export const getGdpPerCapita = (displayedYear) => (d) => {
   return gdpPerCapita?.[getYearIdx(displayedYear)];
 };
 
-//
+// LifeExpAll prediction for in 10 years
+export const getLifeExpPred = (d) => {
+  const { lifeExpPred } = d.properties;
+  if (!lifeExpPred) return -1;
+  return lifeExpPred;
+};
+
+// GDP per Capita prediction for in 10 years
+export const getGdpPerCapitaPred = (d) => {
+  const { gdpPred } = d.properties;
+  if (!gdpPred) return -1;
+  return gdpPred;
+};
+
+// LifeExpAll similiarty value in comparison with other countries --> index = countrycode
+export const getLifeExpSim = (otherCountryCode) => (d) => {
+  const { lifeExpSim } = d.properties;
+  if (!lifeExpSim) return -1;
+  return lifeExpSim?.[otherCountryCode];
+};
+
+// ImmunDpt similiarty value in comparison with other countries --> index = countrycode
+export const getImmunDptSim = (otherCountryCode) => (d) => {
+  const { immunDptSim } = d.properties;
+  if (!immunDptSim) return -1;
+  return immunDptSim?.[otherCountryCode];
+};
+
+// GDP per Capita similiarty value in comparison with other countries --> index = countrycode
+export const getGdpSim = (otherCountryCode) => (d) => {
+  const { gdpSim } = d.properties;
+  if (!gdpSim) return -1;
+  return gdpSim?.[otherCountryCode];
+};
 
 export const getLinearScale = (values = [], range) =>
   scaleLinear({
