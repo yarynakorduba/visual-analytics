@@ -48,10 +48,8 @@ function WorldMap() {
   const colLifeExpAll = useColLifeExpAllLayer(data, year);
 
   const colLifeExpMale = useColLifeExpMaleLayer(data, year, "colLifeExpMale", 15000, 0.5, -0.5);
-  const colLifeExpMaleClose = useColLifeExpMaleLayer(data, year, "colLifeExpMaleClose", 7500, 0.1, -0.2);
 
   const colLifeExpFemale = useColLifeExpFemaleLayer(data, year, "colLifeExpFemale", 15000, 0.5, 0.5);
-  const colLifeExpFemaleClose = useColLifeExpFemaleLayer(data, year, "colLifeExpFemaleClose", 7500, 0.1, 0.2);
 
   const onViewStateChange = ({ viewState, oldViewState, ...rest }) => {
     if (Math.abs(viewState?.longitude - oldViewState?.longitude) > 80) {
@@ -74,16 +72,13 @@ function WorldMap() {
 
   const filterLayers = ({ layer, viewport }) => {
     if (layer.id === "textLifeExpAll") return viewport.zoom > 3 && viewport.zoom <= 4;
-    if (layer.id === "textLifeExpGender") return viewport.zoom > 4 && viewport.zoom <= 6;
-    if (layer.id === "textLifeExpGenderClose") return viewport.zoom > 6 && viewport.zoom <= 8;
+    if (layer.id === "textLifeExpGender") return viewport.zoom > 4;
 
     if (layer.id === "colLifeExpAll") return viewport.zoom < 4;
 
-    if (layer.id === "colLifeExpMale") return viewport.zoom > 4 && viewport.zoom < 6;
-    if (layer.id === "colLifeExpMaleClose") return viewport.zoom >= 6 && viewport.zoom <= 8;
+    if (layer.id === "colLifeExpMale") return viewport.zoom > 4;
 
-    if (layer.id === "colLifeExpFemale") return viewport.zoom > 4 && viewport.zoom < 6;
-    if (layer.id === "colLifeExpFemaleClose") return viewport.zoom >= 6 && viewport.zoom <= 8;
+    if (layer.id === "colLifeExpFemale") return viewport.zoom > 4;
     return true;
   };
 
@@ -91,12 +86,9 @@ function WorldMap() {
     geoJsonLayer,
     textLifeExpAll,
     textLifeExpGender,
-    textLifeExpGenderClose,
     colLifeExpAll,
     colLifeExpMale,
     colLifeExpFemale,
-    colLifeExpFemaleClose,
-    colLifeExpMaleClose,
   ].filter((l) => l);
   if (!data?.features) return "Loading...";
   return (
