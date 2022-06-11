@@ -15,7 +15,7 @@ import {
   getLinearScale,
   getInvertedBandScaleValue,
 } from "./utils";
-import { MIN_AREA_TEXT_SHOWN, GRAY } from "./consts";
+import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT } from "./consts";
 
 // DATASET
 export const useDataset = () => {
@@ -79,7 +79,7 @@ export const useTextLifeExpAllLayer = (data, year) => {
         getColor,
         background: true,
         billboard: true,
-        backgroundColor: [255, 255, 255, 100],
+        getBackgroundColor: () => { return WHITE_TRANSPARENT },
         fontSettings: {
           sdf: true,
           radius: 80,
@@ -134,7 +134,7 @@ export const useTextLifeExpGenderLayer = (data, year, layerId, offset, size) => 
         getColor,
         background: true,
         billboard: true,
-        backgroundColor: [255, 255, 255, 100],
+        getBackgroundColor: () => { return WHITE_TRANSPARENT },
         fontSettings: {
           sdf: true,
           radius: 80,

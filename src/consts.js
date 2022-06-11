@@ -13,3 +13,4 @@ export const AxisVariant = {
 
 // colors
 export const GRAY = [169, 169, 169];
+export const WHITE_TRANSPARENT = [255, 255, 255, 100];

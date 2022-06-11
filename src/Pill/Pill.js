@@ -4,6 +4,8 @@ import "./Pill.scss";
 export const PillVariant = {
   male: "male",
   female: "female",
+  negTrend: "negTrend",
+  posTrend: "posTrend"
 };
 
 // Variant: male / female

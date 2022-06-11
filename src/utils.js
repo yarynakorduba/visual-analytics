@@ -87,6 +87,40 @@ export const getGdpSim = (otherCountryCode) => (d) => {
   return gdpSim?.[otherCountryCode];
 };
 
+export const getMostSimGdp = (d) => {
+  const { gdpSim } = d.properties;
+  if (!gdpSim) return -1;
+  
+  var tempItems = Object.keys(gdpSim).map(function(key) {
+    return [key, gdpSim[key]];
+  });
+  
+  tempItems.sort(function(first, second) {
+    return second[1] - first[1];
+  });
+
+  return tempItems.slice(1, 6).map((x) => {
+    return x[0];
+  }).join(", ");
+};
+
+export const getMostSimLifeExp = (d) => {
+  const { lifeExpSim } = d.properties;
+  if (!lifeExpSim) return -1;
+  
+  var tempItems = Object.keys(lifeExpSim).map(function(key) {
+    return [key, lifeExpSim[key]];
+  });
+  
+  tempItems.sort(function(first, second) {
+    return second[1] - first[1];
+  });
+
+  return tempItems.slice(1, 6).map((x) => {
+    return x[0];
+  }).join(", ");
+};
+
 export const getLinearScale = (values = [], range) =>
   scaleLinear({
     domain: [Math.min(...values), Math.max(...values)],
