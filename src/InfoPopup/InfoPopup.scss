@@ -4,11 +4,15 @@
   z-index: 1;
   left: 2rem;
   top: 2rem;
-  padding: 1rem 0.75rem 2rem 0.75rem;
-  width: 28rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  width: 24rem;
   background: white;
   border-radius: 10px;
-  box-shadow: 8px 8px 15px -1px rgba(0, 0, 0, 0.41);
+  border: 1px solid coral;
+
+  &__header {
+    margin: 0.25rem;
+  }
 
   &__pills {
     padding: 0.5rem;

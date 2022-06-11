@@ -2,7 +2,9 @@ import { useCallback, useMemo, useState, useEffect } from "react";
 import { useTooltipInPortal } from "@visx/tooltip";
 import { area, point } from "@turf/turf";
 import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
-import { scaleSequential, scaleLinear } from "d3-scale";
+import { scaleSequential } from "d3-scale";
+import { scaleLinear } from "@visx/scale";
+
 import { interpolateGreens, interpolateInferno, interpolateBlues, interpolatePuRd } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 import { isNil } from "lodash";
@@ -148,15 +150,18 @@ export const useTextLifeExpGenderLayer = (data, year, layerId, offset, size) => 
 
 const formatRGB = (rgb) => rgb.match(/\d+/g).map(Number);
 const getPolygon = (d) => d.geometry.coordinates;
-const colorScale = (interpolation) => scaleSequential(interpolation).domain([35, 90]);
+const linColorScale = (colorScheme, domain = [35, 90]) => scaleLinear({ range: colorScheme, domain });
+const seqColorScale = (colorScheme, domain = [35, 90]) => scaleSequential(colorScheme).domain(domain);
 
 // GROUND LAYER
 export const useGeojsonLayer = (data, year, onSelect) => {
+  const colorScale = linColorScale(["#bfecd8", "#1A8828"]);
   const getFillColor = useCallback(
     (d) => {
       const value = getImmunRateDpt(year)(d);
       if (value === -1) return GRAY;
-      const color = colorScale(interpolateGreens)(value);
+      const color = colorScale(value);
+
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];
@@ -187,8 +192,8 @@ export const useGeojsonLayer = (data, year, onSelect) => {
       }),
     [data, getFillColor]
   );
-  if (!data?.features) return undefined;
-  return layer;
+  if (!data?.features) return [undefined, undefined];
+  return [layer, colorScale];
 };
 
 const elevationScale = scaleLinear().range([200, 600]).domain([50, 100]);
@@ -207,7 +212,7 @@ export const useColLifeExpAllLayer = (data, year) => {
   const getFillColor = useCallback(
     (d) => {
       const lifeExp = getLifeExpAll(year)(d);
-      const color = colorScale(interpolateInferno)(lifeExp);
+      const color = seqColorScale(interpolateInferno)(lifeExp);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];
@@ -268,7 +273,7 @@ export const useColLifeExpMaleLayer = (data, year, layerId, radius, heightMultip
   const getFillColor = useCallback(
     (d) => {
       const lifeExp = getLifeExpMale(year)(d);
-      const color = colorScale(interpolateBlues)(lifeExp);
+      const color = seqColorScale(interpolateBlues)(lifeExp);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];
@@ -329,7 +334,7 @@ export const useColLifeExpFemaleLayer = (data, year, layerId, radius, heightMult
   const getFillColor = useCallback(
     (d) => {
       const lifeExp = getLifeExpFemale(year)(d);
-      const color = colorScale(interpolatePuRd)(lifeExp);
+      const color = seqColorScale(interpolatePuRd)(lifeExp);
       if (color.startsWith("#")) {
         const { red, green, blue } = hexRgb(color);
         return [red, green, blue];

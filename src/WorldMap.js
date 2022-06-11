@@ -15,6 +15,7 @@ import {
 import { getLifeExpAll, getLifeExpFemale, getLifeExpMale } from "./utils";
 
 import InfoPopup from "./InfoPopup/InfoPopup";
+import MapLegend from "./MapLegend/MapLegend";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2RxbnJmIn0.e0TnDHhdtb5qz3pfPbAgmw"; // Set your mapbox token here
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
@@ -34,6 +35,8 @@ const INITIAL_VIEW_STATE = {
   height: "100vh",
 };
 
+// console.log("MAP STYLE -- >", MAP_STYLE);
+
 // DeckGL react component
 function WorldMap() {
   const [year, setYear] = useState(MAX_YEAR);
@@ -44,16 +47,23 @@ function WorldMap() {
   const textLifeExpGender = useTextLifeExpGenderLayer(data, year, "textLifeExpGender", 1.2, 12);
   const textLifeExpGenderClose = useTextLifeExpGenderLayer(data, year, "textLifeExpGenderClose", 0.5, 12);
 
-  const geoJsonLayer = useGeojsonLayer(data, year, setSelectedCountry);
+  const [geoJsonLayer, colorScale] = useGeojsonLayer(data, year, setSelectedCountry);
   const colLifeExpAll = useColLifeExpAllLayer(data, year);
 
   const colLifeExpMale = useColLifeExpMaleLayer(data, year, "colLifeExpMale", 15000, 0.5, -0.5);
 
   const colLifeExpFemale = useColLifeExpFemaleLayer(data, year, "colLifeExpFemale", 15000, 0.5, 0.5);
 
-  const onViewStateChange = ({ viewState, oldViewState, ...rest }) => {
-    if (Math.abs(viewState?.longitude - oldViewState?.longitude) > 80) {
-      viewState.longitude = Math.sign(oldViewState?.longitude) * 80;
+  const onViewStateChange = ({ viewState, oldViewState }) => {
+    if (viewState.longitude > 90) {
+      viewState.longitude = 90;
+    } else if (viewState.longitude < 0) {
+      viewState.longitude = 0;
+    }
+    if (viewState.latitude > 90) {
+      viewState.latitude = 90;
+    } else if (viewState.latitude < 0) {
+      viewState.latitude = 0;
     }
 
     // update mapbox
@@ -90,19 +100,27 @@ function WorldMap() {
     colLifeExpMale,
     colLifeExpFemale,
   ].filter((l) => l);
-  if (!data?.features) return "Loading...";
+  if (!geoJsonLayer || !data?.features) return "Loading...";
   return (
     <div>
       <DeckGL
         layers={layers}
         layerFilter={filterLayers}
         initialViewState={INITIAL_VIEW_STATE}
+        onViewStateChange={onViewStateChange}
         controller={true}
         getTooltip={displayTooltip}
       >
-        <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} />
+        <Map
+          reuseMaps
+          preventStyleDiffing={true}
+          mapStyle={MAP_STYLE}
+          mapboxAccessToken={MAPBOX_TOKEN}
+          style={{ background: "red" }}
+        />
       </DeckGL>
       {selectedCountry && <InfoPopup country={selectedCountry} year={year} />}
+      <MapLegend scale={colorScale} />
     </div>
   );
 }

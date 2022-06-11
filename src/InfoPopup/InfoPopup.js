@@ -12,6 +12,8 @@ const formatXScale = Math.round;
 const formatYScale = Math.round;
 
 const InfoPopup = ({ year, country }) => {
+  const handleClose = () => {};
+
   const name = country?.object?.properties?.ADMIN || "";
   const maleLifeExpectancy = getLifeExpMale(year)(country.object);
   const femaleLifeExpectancy = getLifeExpFemale(year)(country.object);
@@ -50,7 +52,8 @@ const InfoPopup = ({ year, country }) => {
 
   return (
     <div className="InfoPopup">
-      <h2>{name}</h2>
+      <h2 className="InfoPopup__header">{name}</h2>
+      <button onClick={handleClose}>Close</button>
       <LineChart
         data={dataSeries}
         numXAxisTicks={5}

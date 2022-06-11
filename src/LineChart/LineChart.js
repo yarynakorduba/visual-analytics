@@ -6,16 +6,13 @@ import { ParentSize } from "@visx/responsive";
 import React, { useCallback, useMemo } from "react";
 import { flatMap, flow, isNil, uniq } from "lodash";
 
-// import { ParentSize } from "@visx/responsive";
-// import ChartOverlays from "./ChartOverlays";
-// import Legend from "./Legend";
 import ChartOverlays from "../ChartOverlays";
 import ChartTooltips from "../ChartTooltips";
 import { useTooltipConfigs } from "../hooks";
 import { formatAxisTick, getAxisTickLabelProps, getLinearScale } from "../utils";
 import { ChartVariant, AxisVariant } from "../consts";
 
-const CHART_X_PADDING = 80;
+const CHART_X_PADDING = 40;
 const CHART_Y_PADDING = 24;
 
 const GRAY = "#E1E5EA";
@@ -55,10 +52,6 @@ const LineChart = ({
     [cleanWidth, isVertical, numXAxisTicks, xValues.length]
   );
 
-  const isEmpty = useMemo(() => !xValues?.length || !yValues?.length, [xValues?.length, yValues?.length]);
-
-  // const { xScale, yScale } = useBandLinScale(xValues, yValues, cleanWidth, cleanHeight, isEmpty, isVertical);
-
   const xScale = getLinearScale(xValues, [0, cleanWidth]);
   const yScale = getLinearScale(yValues, [cleanHeight, 0]);
 
@@ -89,19 +82,6 @@ const LineChart = ({
     },
     [isVertical, xScale, yScale]
   );
-
-  // const labels = useMemo(
-  //   () =>
-  //     data?.map(
-  //       ({ label, color }) => ({
-  //         label,
-  //         color,
-  //         width: 20,
-  //         height: 4,
-  //       }),
-  //     ),
-  //   [data],
-  // );
 
   const { pointTooltip, xTooltip, yTooltip, handleHover, handleMouseLeave, containerRef } = useTooltipConfigs(
     CHART_X_PADDING,

@@ -1,0 +1,25 @@
+.MapLegend {
+  position: absolute;
+  z-index: 100;
+  background: white;
+  width: 200px;
+  height: 60px;
+  top: 0;
+  right: 0;
+  padding: 0.5rem;
+
+  &__header {
+    margin: 0.25rem;
+    padding: 0;
+    text-align: left;
+  }
+
+  &__items {
+    display: flex;
+  }
+  &__label {
+    font-size: 0.875rem;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+}
