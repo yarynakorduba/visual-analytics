@@ -81,7 +81,9 @@ export const useTextLifeExpAllLayer = (data, year) => {
         getColor,
         background: true,
         billboard: true,
-        getBackgroundColor: () => { return WHITE_TRANSPARENT },
+        getBackgroundColor: () => {
+          return WHITE_TRANSPARENT;
+        },
         fontSettings: {
           sdf: true,
           radius: 80,
@@ -136,7 +138,9 @@ export const useTextLifeExpGenderLayer = (data, year, layerId, offset, size) => 
         getColor,
         background: true,
         billboard: true,
-        getBackgroundColor: () => { return WHITE_TRANSPARENT },
+        getBackgroundColor: () => {
+          return WHITE_TRANSPARENT;
+        },
         fontSettings: {
           sdf: true,
           radius: 80,
@@ -154,7 +158,7 @@ const linColorScale = (colorScheme, domain = [35, 90]) => scaleLinear({ range: c
 const seqColorScale = (colorScheme, domain = [35, 90]) => scaleSequential(colorScheme).domain(domain);
 
 // GROUND LAYER
-export const useGeojsonLayer = (data, year, onSelect) => {
+export const useGeojsonLayer = (data, year, onClick) => {
   const colorScale = linColorScale(["#bfecd8", "#1A8828"]);
   const getFillColor = useCallback(
     (d) => {
@@ -186,11 +190,9 @@ export const useGeojsonLayer = (data, year, onSelect) => {
         getPolygon,
         extruded: false,
         pickable: true, // enables picking of the elements
-        onClick: (d) => {
-          onSelect(d);
-        },
+        onClick,
       }),
-    [data, getFillColor]
+    [data, getFillColor, onClick]
   );
   if (!data?.features) return [undefined, undefined];
   return [layer, colorScale];
@@ -486,4 +488,39 @@ export const useTooltipConfigs = (
     handleMouseLeave,
     containerRef,
   };
+};
+
+export const useMapViewState = () => {
+  const initViewState = {
+    latitude: 10.3,
+    longitude: 18.31,
+    zoom: 2,
+    minZoom: 2,
+    maxZoom: 8,
+    pitch: 45,
+    bearing: 0,
+    maxPitch: 60,
+    minPitch: 20,
+
+    width: "100vw",
+    height: "100vh",
+  };
+
+  const onViewStateChange = ({ viewState }) => {
+    if (viewState.longitude > 90) {
+      viewState.longitude = 90;
+    } else if (viewState.longitude < 0) {
+      viewState.longitude = 0;
+    }
+    if (viewState.latitude > 90) {
+      viewState.latitude = 90;
+    } else if (viewState.latitude < 0) {
+      viewState.latitude = 0;
+    }
+
+    // update mapbox
+    return viewState;
+  };
+
+  return { onViewStateChange, initViewState };
 };

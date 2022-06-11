@@ -1,19 +1,25 @@
 import React from "react";
-import { getGdpPerCapita, getGdpPerCapitaPred, getLifeExpAll, getLifeExpFemale, getLifeExpMale, getLifeExpPred, getMostSimGdp, getMostSimLifeExp } from "../utils";
+import {
+  getGdpPerCapita,
+  getGdpPerCapitaPred,
+  getLifeExpAll,
+  getLifeExpFemale,
+  getLifeExpMale,
+  getLifeExpPred,
+  getMostSimGdp,
+  getMostSimLifeExp,
+} from "../utils";
 
 import LineChart from "../LineChart";
 import Pill, { PillVariant } from "../Pill";
-
 import { MAX_YEAR, MIN_YEAR } from "../consts";
 
 import "./InfoPopup.scss";
-//
+
 const formatXScale = Math.round;
 const formatYScale = Math.round;
 
-const InfoPopup = ({ year, country }) => {
-  const handleClose = () => {};
-
+const InfoPopup = ({ year, country, onClose }) => {
   const name = country?.object?.properties?.ADMIN || "";
   const maleLifeExpectancy = getLifeExpMale(year)(country.object);
   const femaleLifeExpectancy = getLifeExpFemale(year)(country.object);
@@ -53,7 +59,9 @@ const InfoPopup = ({ year, country }) => {
   return (
     <div className="InfoPopup">
       <h2 className="InfoPopup__header">{name}</h2>
-      <button onClick={handleClose}>Close</button>
+      <button className="InfoPopup__close" onClick={onClose}>
+        &#10005;
+      </button>
       <LineChart
         data={dataSeries}
         numXAxisTicks={5}
@@ -68,19 +76,19 @@ const InfoPopup = ({ year, country }) => {
       <div className="InfoPopup__other">
         <h3>Future Predictions (in 2030)</h3>
         Average Life Expectancy:
-        { lifeExpPred >= lifeExpAll && <Pill variant={PillVariant.posTrend}>{lifeExpPred} years</Pill>}
-        { lifeExpPred < lifeExpAll && <Pill variant={PillVariant.negTrend}>{lifeExpPred} years</Pill>}
+        {lifeExpPred >= lifeExpAll && <Pill variant={PillVariant.posTrend}>{lifeExpPred} years</Pill>}
+        {lifeExpPred < lifeExpAll && <Pill variant={PillVariant.negTrend}>{lifeExpPred} years</Pill>}
         <br></br>
         GDP per Capita:
-        { gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}
-        { gdpPred < gdpPerCapita && <Pill variant={PillVariant.negTrend}>${gdpPred}</Pill>}
+        {gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}
+        {gdpPred < gdpPerCapita && <Pill variant={PillVariant.negTrend}>${gdpPred}</Pill>}
       </div>
       <br></br>
       <div className="InfoPopup__other">
         <h3>Most Similar Countries</h3>
-        Average Life Expectancy: { mostSimLifeExp }
+        Average Life Expectancy: {mostSimLifeExp}
         <br></br>
-        GDP per Capita: { mostSimGdp }
+        GDP per Capita: {mostSimGdp}
       </div>
     </div>
   );

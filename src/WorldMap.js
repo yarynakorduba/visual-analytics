@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Map } from "react-map-gl";
 import DeckGL from "@deck.gl/react";
+import { isEqual } from "lodash";
 
 import { MAX_YEAR } from "./consts";
 import {
@@ -11,6 +12,7 @@ import {
   useGeojsonLayer,
   useTextLifeExpAllLayer,
   useTextLifeExpGenderLayer,
+  useMapViewState,
 } from "./hooks";
 import { getLifeExpAll, getLifeExpFemale, getLifeExpMale } from "./utils";
 
@@ -20,55 +22,43 @@ import MapLegend from "./MapLegend/MapLegend";
 const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2RxbnJmIn0.e0TnDHhdtb5qz3pfPbAgmw"; // Set your mapbox token here
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 
-const INITIAL_VIEW_STATE = {
-  latitude: 10.3,
-  longitude: 18.31,
-  zoom: 2,
-  minZoom: 2,
-  maxZoom: 8,
-  pitch: 45,
-  bearing: 0,
-  maxPitch: 60,
-  minPitch: 20,
-
-  width: "100vw",
-  height: "100vh",
-};
-
-// console.log("MAP STYLE -- >", MAP_STYLE);
-
 // DeckGL react component
 function WorldMap() {
   const [year, setYear] = useState(MAX_YEAR);
   const [data] = useDataset();
+  const [selectedCountries, setSelectedCountries] = useState([]);
 
-  const [selectedCountry, setSelectedCountry] = useState(undefined);
+  const onToggleCountry = useCallback(
+    (country) => {
+      const filteredCountries = selectedCountries.filter(
+        (element) => console.log(element) || element?.object?.properties?.ADMIN !== country?.object?.properties?.ADMIN
+      );
+      const isAlreadySelected = filteredCountries.length !== selectedCountries.length;
+      if (isAlreadySelected) {
+        setSelectedCountries(filteredCountries);
+      } else {
+        setSelectedCountries([...filteredCountries, country]);
+      }
+    },
+    [selectedCountries]
+  );
+
+  const onDeselectCountries = useCallback(() => {
+    setSelectedCountries([]);
+  }, [setSelectedCountries]);
+
+  console.log("selectedCountries >>> ", selectedCountries);
+
   const textLifeExpAll = useTextLifeExpAllLayer(data, year);
   const textLifeExpGender = useTextLifeExpGenderLayer(data, year, "textLifeExpGender", 1.2, 12);
   const textLifeExpGenderClose = useTextLifeExpGenderLayer(data, year, "textLifeExpGenderClose", 0.5, 12);
 
-  const [geoJsonLayer, colorScale] = useGeojsonLayer(data, year, setSelectedCountry);
+  const [geoJsonLayer, colorScale] = useGeojsonLayer(data, year, onToggleCountry);
   const colLifeExpAll = useColLifeExpAllLayer(data, year);
-
   const colLifeExpMale = useColLifeExpMaleLayer(data, year, "colLifeExpMale", 15000, 0.5, -0.5);
-
   const colLifeExpFemale = useColLifeExpFemaleLayer(data, year, "colLifeExpFemale", 15000, 0.5, 0.5);
 
-  const onViewStateChange = ({ viewState, oldViewState }) => {
-    if (viewState.longitude > 90) {
-      viewState.longitude = 90;
-    } else if (viewState.longitude < 0) {
-      viewState.longitude = 0;
-    }
-    if (viewState.latitude > 90) {
-      viewState.latitude = 90;
-    } else if (viewState.latitude < 0) {
-      viewState.latitude = 0;
-    }
-
-    // update mapbox
-    return viewState;
-  };
+  const { initViewState, onViewStateChange } = useMapViewState();
 
   const displayTooltip = (info) => {
     if (!info || !info.object) return undefined;
@@ -106,7 +96,7 @@ function WorldMap() {
       <DeckGL
         layers={layers}
         layerFilter={filterLayers}
-        initialViewState={INITIAL_VIEW_STATE}
+        initialViewState={initViewState}
         onViewStateChange={onViewStateChange}
         controller={true}
         getTooltip={displayTooltip}
@@ -119,7 +109,9 @@ function WorldMap() {
           style={{ background: "red" }}
         />
       </DeckGL>
-      {selectedCountry && <InfoPopup country={selectedCountry} year={year} />}
+      {selectedCountries?.length && (
+        <InfoPopup country={selectedCountries?.[0]} year={year} onClose={onDeselectCountries} />
+      )}
       <MapLegend scale={colorScale} />
     </div>
   );
