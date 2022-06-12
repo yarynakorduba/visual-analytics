@@ -2,23 +2,22 @@
   position: absolute;
   z-index: 100;
   background: white;
-  width: 200px;
-  height: 60px;
   top: 0;
   right: 0;
-  padding: 0.5rem;
+  padding: 0.25rem;
 
   &__header {
     margin: 0.25rem;
     padding: 0;
     text-align: left;
+    font-size: 0.875rem;
   }
 
   &__items {
     display: flex;
   }
   &__label {
-    font-size: 0.875rem;
+    font-size: 0.6rem;
     text-anchor: middle;
     dominant-baseline: middle;
   }

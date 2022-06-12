@@ -4,10 +4,9 @@ import { area, point } from "@turf/turf";
 import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
 import { scaleSequential } from "d3-scale";
 import { scaleLinear } from "@visx/scale";
-
 import { interpolateGreens, interpolateInferno, interpolateBlues, interpolatePuRd } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
-import { isNil } from "lodash";
+import { isNil, keyBy } from "lodash";
 import {
   getLifeExpAll,
   getLifeExpFemale,
@@ -16,6 +15,8 @@ import {
   getBandScale,
   getLinearScale,
   getInvertedBandScaleValue,
+  getGdpPerCapita,
+  getGdp,
 } from "./utils";
 import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT } from "./consts";
 
@@ -154,15 +155,22 @@ export const useTextLifeExpGenderLayer = (data, year, layerId, offset, size) => 
 
 const formatRGB = (rgb) => rgb.match(/\d+/g).map(Number);
 const getPolygon = (d) => d.geometry.coordinates;
-const linColorScale = (colorScheme, domain = [35, 90]) => scaleLinear({ range: colorScheme, domain });
-const seqColorScale = (colorScheme, domain = [35, 90]) => scaleSequential(colorScheme).domain(domain);
+const linColorScale = (colorScheme = ["#bfecd8", "#1A8828"], domain = [35, 90]) =>
+  scaleLinear({ range: colorScheme, domain });
+const seqColorScale = (colorScheme = ["#bfecd8", "#1A8828"], domain = [35, 90]) =>
+  scaleSequential(colorScheme).domain(domain);
 
 // GROUND LAYER
-export const useGeojsonLayer = (data, year, onClick) => {
-  const colorScale = linColorScale(["#bfecd8", "#1A8828"]);
+export const useGeojsonLayer = (data, year, onClick, selectedCountries = [], getValue = getGdp) => {
+  const indexedSelectedCountries = keyBy(selectedCountries, (country) => country.object?.properties?.ADMIN);
+  const values = data ? data?.features?.map((d) => getValue(year)(d)).filter((d) => d !== -1) : [];
+  const domain = values.length && [Math.min(...values), Math.max(...values)];
+
+  const colorScale = domain && linColorScale(["#bfecd8", "#1A8828"], domain);
+
   const getFillColor = useCallback(
     (d) => {
-      const value = getImmunRateDpt(year)(d);
+      const value = getValue(year)(d);
       if (value === -1) return GRAY;
       const color = colorScale(value);
 
@@ -173,7 +181,17 @@ export const useGeojsonLayer = (data, year, onClick) => {
         return formatRGB(color);
       }
     },
-    [year]
+    [year, domain]
+  );
+
+  const getLineColor = useCallback(
+    (d) => {
+      if (!!indexedSelectedCountries[d?.properties?.ADMIN]) {
+        return [255, 0, 0, 1];
+      }
+      return [255, 255, 255, 255];
+    },
+    [indexedSelectedCountries]
   );
 
   const layer = useMemo(
@@ -182,19 +200,26 @@ export const useGeojsonLayer = (data, year, onClick) => {
         id: "ground-layer",
         data,
         stroked: true,
-        getLineColor: [255, 255, 255, 255],
         getLineWidth: 1,
         lineWidthScale: 2,
         lineWidthMinPixels: 0.5,
-        getFillColor,
         getPolygon,
         extruded: false,
         pickable: true, // enables picking of the elements
         onClick,
+        getFillColor,
+        getLineColor,
+        updateTriggers: {
+          getLineColor: [selectedCountries],
+        },
+        transitions: {
+          getLineColor: 1000,
+        },
       }),
-    [data, getFillColor, onClick]
+    [data, onClick, getFillColor, getLineColor, selectedCountries]
   );
-  if (!data?.features) return [undefined, undefined];
+
+  if (!data?.features || !domain) return [undefined, undefined];
   return [layer, colorScale];
 };
 

@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Map } from "react-map-gl";
 import DeckGL from "@deck.gl/react";
-import { isEqual } from "lodash";
 
 import { MAX_YEAR } from "./consts";
 import {
@@ -14,7 +13,7 @@ import {
   useTextLifeExpGenderLayer,
   useMapViewState,
 } from "./hooks";
-import { getLifeExpAll, getLifeExpFemale, getLifeExpMale } from "./utils";
+import { getGdp, getGdpPerCapita, getImmunRateDpt, getLifeExpAll, getLifeExpFemale, getLifeExpMale } from "./utils";
 
 import InfoPopup from "./InfoPopup/InfoPopup";
 import MapLegend from "./MapLegend/MapLegend";
@@ -22,16 +21,23 @@ import MapLegend from "./MapLegend/MapLegend";
 const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2RxbnJmIn0.e0TnDHhdtb5qz3pfPbAgmw"; // Set your mapbox token here
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 
+const COLOR_INDICATORS = {
+  GDP: { label: "GDP", getter: getGdp },
+  GDP_PER_CAPITA: { label: "GDP per capita", getter: getGdpPerCapita },
+  IMMUNIZATION: { label: "Immunization", getter: getImmunRateDpt },
+};
+
 // DeckGL react component
 function WorldMap() {
   const [year, setYear] = useState(MAX_YEAR);
   const [data] = useDataset();
   const [selectedCountries, setSelectedCountries] = useState([]);
+  const [colorIndicator, setColorIndicator] = useState(COLOR_INDICATORS.GDP);
 
   const onToggleCountry = useCallback(
     (country) => {
       const filteredCountries = selectedCountries.filter(
-        (element) => console.log(element) || element?.object?.properties?.ADMIN !== country?.object?.properties?.ADMIN
+        (element) => element?.object?.properties?.ADMIN !== country?.object?.properties?.ADMIN
       );
       const isAlreadySelected = filteredCountries.length !== selectedCountries.length;
       if (isAlreadySelected) {
@@ -47,13 +53,11 @@ function WorldMap() {
     setSelectedCountries([]);
   }, [setSelectedCountries]);
 
-  console.log("selectedCountries >>> ", selectedCountries);
-
   const textLifeExpAll = useTextLifeExpAllLayer(data, year);
   const textLifeExpGender = useTextLifeExpGenderLayer(data, year, "textLifeExpGender", 1.2, 12);
   const textLifeExpGenderClose = useTextLifeExpGenderLayer(data, year, "textLifeExpGenderClose", 0.5, 12);
 
-  const [geoJsonLayer, colorScale] = useGeojsonLayer(data, year, onToggleCountry);
+  const [geoJsonLayer, colorScale] = useGeojsonLayer(data, year, onToggleCountry, selectedCountries);
   const colLifeExpAll = useColLifeExpAllLayer(data, year);
   const colLifeExpMale = useColLifeExpMaleLayer(data, year, "colLifeExpMale", 15000, 0.5, -0.5);
   const colLifeExpFemale = useColLifeExpFemaleLayer(data, year, "colLifeExpFemale", 15000, 0.5, 0.5);
@@ -64,9 +68,7 @@ function WorldMap() {
     if (!info || !info.object) return undefined;
 
     if (info.layer?.id === "colLifeExpFemale") return `Female: ${Math.round(getLifeExpFemale(year)(info.object))}y.`;
-
     if (info.layer?.id === "colLifeExpMale") return `Male: ${Math.round(getLifeExpMale(year)(info.object))}y.`;
-
     if (info.layer?.id === "colLifeExpAll") return `Avg: ${Math.round(getLifeExpAll(year)(info.object))}y.`;
   };
 
@@ -90,7 +92,9 @@ function WorldMap() {
     colLifeExpMale,
     colLifeExpFemale,
   ].filter((l) => l);
+
   if (!geoJsonLayer || !data?.features) return "Loading...";
+
   return (
     <div>
       <DeckGL
@@ -109,10 +113,10 @@ function WorldMap() {
           style={{ background: "red" }}
         />
       </DeckGL>
-      {selectedCountries?.length && (
+      {selectedCountries?.length ? (
         <InfoPopup country={selectedCountries?.[0]} year={year} onClose={onDeselectCountries} />
-      )}
-      <MapLegend scale={colorScale} />
+      ) : null}
+      <MapLegend scale={colorScale} label={colorIndicator?.label} />
     </div>
   );
 }
