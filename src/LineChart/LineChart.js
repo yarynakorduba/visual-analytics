@@ -187,7 +187,7 @@ export default function ResponsiveLineChart({
 
   if (!isResponsive) return renderChart(width);
   return (
-    <ParentSize parentSizeStyles={{ maxHeight: height, maxWidth: width, height, margin: "0 0 1.5rem 0" }}>
+    <ParentSize parentSizeStyles={{ maxHeight: height, maxWidth: width, height, margin: "0 0 0.5rem 0" }}>
       {renderResponsiveChart}
     </ParentSize>
   );
