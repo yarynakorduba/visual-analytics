@@ -38,12 +38,18 @@ const LineChart = ({
   formatYScale,
   numXAxisTicks = 8, // approximate
   numYAxisTicks = 8,
+  padding = {
+    top: CHART_Y_PADDING,
+    bottom: CHART_Y_PADDING,
+    left: CHART_X_PADDING,
+    right: CHART_X_PADDING,
+  },
 }) => {
   const cleanWidth = useMemo(() => {
-    const clean = width - 2 * CHART_X_PADDING;
+    const clean = width - padding.left - padding.right;
     return clean > 0 ? clean : 0;
-  }, [width]);
-  const cleanHeight = useMemo(() => height - 2 * CHART_Y_PADDING, [height]);
+  }, [padding.left, padding.right, width]);
+  const cleanHeight = useMemo(() => height - 2 * padding.top - padding.bottom, [height, padding.bottom, padding.top]);
 
   const isVertical = useMemo(() => variant === ChartVariant.vertical, [variant]);
 
@@ -87,8 +93,8 @@ const LineChart = ({
   );
 
   const { pointTooltip, xTooltip, yTooltip, handleHover, handleMouseLeave, containerRef } = useTooltipConfigs(
-    CHART_X_PADDING,
-    CHART_Y_PADDING,
+    padding.left,
+    padding.top,
     cleanHeight,
     variant,
     xScale,
@@ -102,7 +108,7 @@ const LineChart = ({
       <h4 className="LineChart__heading">{heading}</h4>
       <div className="LineChart__wrapper">
         <svg width={width} height={height} ref={containerRef}>
-          <Group left={CHART_X_PADDING} top={CHART_Y_PADDING}>
+          <Group left={padding.left} top={padding.top}>
             {variant === ChartVariant.vertical ? (
               <GridRows scale={yScale} width={cleanWidth} height={cleanHeight} stroke={GRAY} />
             ) : (
@@ -121,15 +127,15 @@ const LineChart = ({
               scale={yScale}
               hideTicks
               hideAxisLine
-              tickFormat={formatAxisTick(CHART_X_PADDING, formatYScale)}
+              tickFormat={formatAxisTick(padding.left, formatYScale)}
               tickLabelProps={getAxisTickLabelProps(AxisVariant.left)}
               numTicks={numYAxisTicks}
             />
             {data?.map(renderLine)}
           </Group>
           <ChartOverlays
-            offsetLeft={CHART_X_PADDING}
-            offsetTop={CHART_Y_PADDING}
+            offsetLeft={padding.left}
+            offsetTop={padding.top}
             width={cleanWidth}
             height={cleanHeight}
             xScale={xScale}
@@ -157,6 +163,7 @@ export default function ResponsiveLineChart({
   numXAxisTicks = 8, // approximate
   numYAxisTicks = 8, // approximate
   isResponsive = true,
+  padding,
 }) {
   const renderChart = useCallback(
     (chartWidth, chartHeight) => (
@@ -170,9 +177,10 @@ export default function ResponsiveLineChart({
         formatYScale={formatYScale}
         numXAxisTicks={numXAxisTicks} // approximate
         numYAxisTicks={numYAxisTicks}
+        padding={padding}
       />
     ),
-    [data, formatXScale, formatYScale, heading, numXAxisTicks, numYAxisTicks, variant]
+    [data, formatXScale, formatYScale, heading, numXAxisTicks, numYAxisTicks, variant, padding]
   );
 
   const renderResponsiveChart = useCallback(

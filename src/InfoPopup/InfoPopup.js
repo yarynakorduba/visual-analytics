@@ -19,7 +19,26 @@ import { MAX_YEAR } from "../consts";
 import "./InfoPopup.scss";
 
 const formatXScale = Math.round;
-const formatYScale = Math.round;
+const formatYScale = (d) => {
+  const MILLION = 1000 * 1000;
+  const BILLION = 1000 * MILLION;
+  const TRILLION = 1000 * BILLION;
+  console.log("===>", d);
+  if (d >= TRILLION) {
+    return `${Math.round(d) / TRILLION}T`;
+  }
+  if (d >= BILLION) {
+    return `${Math.round(d) / BILLION}B`;
+  }
+  if (d >= MILLION) {
+    // one million
+    return `${Math.round(d) / MILLION}MM`;
+  }
+  if (d >= 1000) {
+    return `${Math.round(d) / 1000}K`;
+  }
+  return Math.round(d);
+};
 
 const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }) => {
   const name = country?.object?.properties?.ADMIN || "";
@@ -48,7 +67,8 @@ const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }
         numYAxisTicks={5}
         formatXScale={formatXScale}
         formatYScale={formatYScale}
-        height={150}
+        height={250}
+        padding={{ top: 30, bottom: 30, left: 30, right: 15 }}
       />
       <div className="InfoPopup__pills">
         <Pill variant={PillVariant.male}>{maleLifeExpectancy} years</Pill>
@@ -61,7 +81,8 @@ const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }
         numYAxisTicks={5}
         formatXScale={formatXScale}
         formatYScale={formatYScale}
-        height={150}
+        height={250}
+        padding={{ top: 30, bottom: 30, left: 30, right: 15 }}
       />
       <div className="InfoPopup__other">
         <h3>Future Predictions (in 2030)</h3>
