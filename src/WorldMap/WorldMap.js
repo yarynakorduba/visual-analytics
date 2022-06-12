@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { Map } from "react-map-gl";
 import DeckGL from "@deck.gl/react";
 
-import { MAX_YEAR } from "./consts";
+import { MAX_YEAR } from "../consts";
 import {
   useColLifeExpAllLayer,
   useColLifeExpMaleLayer,
@@ -12,19 +12,29 @@ import {
   useTextLifeExpAllLayer,
   useTextLifeExpGenderLayer,
   useMapViewState,
-} from "./hooks";
-import { getGdp, getGdpPerCapita, getImmunRateDpt, getLifeExpAll, getLifeExpFemale, getLifeExpMale } from "./utils";
+} from "../hooks";
+import {
+  getGdp,
+  getGdpPerCapita,
+  getImmunRateDpt,
+  getLifeExpAll,
+  getLifeExpFemale,
+  getLifeExpMale,
+  getGdpChartData,
+} from "../utils";
 
-import InfoPopup from "./InfoPopup/InfoPopup";
-import MapLegend from "./MapLegend/MapLegend";
+import InfoPopup from "../InfoPopup/InfoPopup";
+import MapLegend from "../MapLegend/MapLegend";
+
+import "./WorldMap.scss";
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoieWFyeWNrYSIsImEiOiJjazd0ZzAyYXYweGFtM2dxdHBxN2RxbnJmIn0.e0TnDHhdtb5qz3pfPbAgmw"; // Set your mapbox token here
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
 
 const COLOR_INDICATORS = {
-  GDP: { label: "GDP", getter: getGdp },
-  GDP_PER_CAPITA: { label: "GDP per capita", getter: getGdpPerCapita },
-  IMMUNIZATION: { label: "Immunization", getter: getImmunRateDpt },
+  GDP: { label: "GDP", getter: getGdp, chartDataGetter: getGdpChartData },
+  GDP_PER_CAPITA: { label: "GDP per capita", getter: getGdpPerCapita, chartDataGetter: getGdpChartData },
+  IMMUNIZATION: { label: "Immunization", getter: getImmunRateDpt, chartDataGetter: getGdpChartData },
 };
 
 // DeckGL react component
@@ -93,7 +103,7 @@ function WorldMap() {
     colLifeExpFemale,
   ].filter((l) => l);
 
-  if (!geoJsonLayer || !data?.features) return "Loading...";
+  if (!geoJsonLayer || !data?.features) return <div className="WorldMap__loader">Loading...</div>;
 
   return (
     <div>
