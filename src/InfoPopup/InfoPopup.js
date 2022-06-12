@@ -8,18 +8,20 @@ import {
   getLifeExpPred,
   getMostSimGdp,
   getMostSimLifeExp,
+  getMaleFemaleChartData,
+  getGdpChartData,
 } from "../utils";
 
 import LineChart from "../LineChart";
 import Pill, { PillVariant } from "../Pill";
-import { MAX_YEAR, MIN_YEAR } from "../consts";
+import { MAX_YEAR } from "../consts";
 
 import "./InfoPopup.scss";
 
 const formatXScale = Math.round;
 const formatYScale = Math.round;
 
-const InfoPopup = ({ year, country, onClose }) => {
+const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }) => {
   const name = country?.object?.properties?.ADMIN || "";
   const maleLifeExpectancy = getLifeExpMale(year)(country.object);
   const femaleLifeExpectancy = getLifeExpFemale(year)(country.object);
@@ -30,31 +32,8 @@ const InfoPopup = ({ year, country, onClose }) => {
   const gdpPred = getGdpPerCapitaPred(country.object);
   const mostSimGdp = getMostSimGdp(country.object);
 
-  const maleData = {
-    id: "male",
-    label: "Male",
-    color: "blue",
-    datapoints: country?.object?.properties?.lifeExpMale?.map((yearData, index) => {
-      return {
-        valueY: yearData,
-        valueX: MIN_YEAR + index,
-      };
-    }),
-  };
-
-  const femaleData = {
-    id: "female",
-    label: "Female",
-    color: "pink",
-    datapoints: country?.object?.properties?.lifeExpFemale?.map((yearData, index) => {
-      return {
-        valueY: yearData,
-        valueX: MIN_YEAR + index,
-      };
-    }),
-  };
-
-  const dataSeries = [maleData, femaleData];
+  const firstChartData = getMaleFemaleChartData(country);
+  const secondChartData = getGdpChartData(country);
 
   return (
     <div className="InfoPopup">
@@ -63,16 +42,27 @@ const InfoPopup = ({ year, country, onClose }) => {
         &#10005;
       </button>
       <LineChart
-        data={dataSeries}
+        heading={firstChartLabel}
+        data={firstChartData}
         numXAxisTicks={5}
+        numYAxisTicks={5}
         formatXScale={formatXScale}
         formatYScale={formatYScale}
-        height={300}
+        height={150}
       />
       <div className="InfoPopup__pills">
         <Pill variant={PillVariant.male}>{maleLifeExpectancy} years</Pill>
         <Pill variant={PillVariant.female}>{femaleLifeExpectancy} years</Pill>
       </div>
+      <LineChart
+        heading={secondChartLabel}
+        data={secondChartData}
+        numXAxisTicks={5}
+        numYAxisTicks={5}
+        formatXScale={formatXScale}
+        formatYScale={formatYScale}
+        height={150}
+      />
       <div className="InfoPopup__other">
         <h3>Future Predictions (in 2030)</h3>
         Average Life Expectancy:

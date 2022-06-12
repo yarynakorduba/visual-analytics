@@ -114,7 +114,13 @@ function WorldMap() {
         />
       </DeckGL>
       {selectedCountries?.length ? (
-        <InfoPopup country={selectedCountries?.[0]} year={year} onClose={onDeselectCountries} />
+        <InfoPopup
+          country={selectedCountries?.[0]}
+          year={year}
+          onClose={onDeselectCountries}
+          firstChartLabel={"Life expectancy"}
+          secondChartLabel={colorIndicator?.label}
+        />
       ) : null}
       <MapLegend scale={colorScale} label={colorIndicator?.label} />
     </div>

@@ -2,10 +2,11 @@
   display: absolute;
   position: relative;
   z-index: 1;
-  left: 2rem;
-  top: 2rem;
+  left: 0.5rem;
+  top: 0.5rem;
   padding: 0.5rem 0.5rem 0.5rem 0.5rem;
   width: 24rem;
+  height: calc(100vh - 2rem);
   background: white;
   border-radius: 10px;
   border: 1px solid rgb(44, 62, 80);

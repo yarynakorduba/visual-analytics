@@ -12,8 +12,10 @@ import { useTooltipConfigs } from "../hooks";
 import { formatAxisTick, getAxisTickLabelProps, getLinearScale } from "../utils";
 import { ChartVariant, AxisVariant } from "../consts";
 
+import "./LineChart.scss";
+
 const CHART_X_PADDING = 40;
-const CHART_Y_PADDING = 24;
+const CHART_Y_PADDING = 30;
 
 const GRAY = "#E1E5EA";
 
@@ -35,6 +37,7 @@ const LineChart = ({
   formatXScale,
   formatYScale,
   numXAxisTicks = 8, // approximate
+  numYAxisTicks = 8,
 }) => {
   const cleanWidth = useMemo(() => {
     const clean = width - 2 * CHART_X_PADDING;
@@ -80,7 +83,7 @@ const LineChart = ({
         />
       );
     },
-    [isVertical, xScale, yScale]
+    [xScale, yScale]
   );
 
   const { pointTooltip, xTooltip, yTooltip, handleHover, handleMouseLeave, containerRef } = useTooltipConfigs(
@@ -96,10 +99,8 @@ const LineChart = ({
 
   return (
     <>
-      <h2 level={2} isCentered>
-        {heading}
-      </h2>
-      <div style={{ position: "relative" }}>
+      <h4 className="LineChart__heading">{heading}</h4>
+      <div className="LineChart__wrapper">
         <svg width={width} height={height} ref={containerRef}>
           <Group left={CHART_X_PADDING} top={CHART_Y_PADDING}>
             {variant === ChartVariant.vertical ? (
@@ -114,7 +115,7 @@ const LineChart = ({
               hideAxisLine
               tickFormat={formatAxisTick(xTickWidth, formatXScale)}
               tickLabelProps={getAxisTickLabelProps()}
-              numTicks={5}
+              numTicks={numXAxisTicks}
             />
             <AxisLeft
               scale={yScale}
@@ -122,6 +123,7 @@ const LineChart = ({
               hideAxisLine
               tickFormat={formatAxisTick(CHART_X_PADDING, formatYScale)}
               tickLabelProps={getAxisTickLabelProps(AxisVariant.left)}
+              numTicks={numYAxisTicks}
             />
             {data?.map(renderLine)}
           </Group>
@@ -153,32 +155,40 @@ export default function ResponsiveLineChart({
   formatXScale,
   formatYScale,
   numXAxisTicks = 8, // approximate
+  numYAxisTicks = 8, // approximate
   isResponsive = true,
 }) {
   const renderChart = useCallback(
-    (chartWidth) => (
+    (chartWidth, chartHeight) => (
       <LineChart
         width={chartWidth}
-        height={height}
+        height={chartHeight}
         heading={heading}
         variant={variant}
         data={data}
         formatXScale={formatXScale}
         formatYScale={formatYScale}
         numXAxisTicks={numXAxisTicks} // approximate
+        numYAxisTicks={numYAxisTicks}
       />
     ),
-    [data, formatXScale, formatYScale, heading, height, numXAxisTicks, variant]
+    [data, formatXScale, formatYScale, heading, numXAxisTicks, numYAxisTicks, variant]
   );
 
   const renderResponsiveChart = useCallback(
     (parent) => {
       const responsiveWidth = !isNil(width) && Math.min(width, parent.width);
-      return renderChart(responsiveWidth);
+      const responsiveHeight = !isNil(height) && Math.min(height, parent.height);
+      console.log(">>>> ", responsiveHeight);
+      return renderChart(responsiveWidth, responsiveHeight);
     },
-    [renderChart, width]
+    [renderChart, width, height]
   );
 
   if (!isResponsive) return renderChart(width);
-  return <ParentSize>{renderResponsiveChart}</ParentSize>;
+  return (
+    <ParentSize parentSizeStyles={{ maxHeight: height, maxWidth: width, height, margin: "0 0 1.5rem 0" }}>
+      {renderResponsiveChart}
+    </ParentSize>
+  );
 }

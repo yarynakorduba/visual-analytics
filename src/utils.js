@@ -90,35 +90,41 @@ export const getGdpSim = (otherCountryCode) => (d) => {
 export const getMostSimGdp = (d) => {
   const { gdpSim } = d.properties;
   if (!gdpSim) return -1;
-  
-  var tempItems = Object.keys(gdpSim).map(function(key) {
+
+  var tempItems = Object.keys(gdpSim).map(function (key) {
     return [key, gdpSim[key]];
   });
-  
-  tempItems.sort(function(first, second) {
+
+  tempItems.sort(function (first, second) {
     return second[1] - first[1];
   });
 
-  return tempItems.slice(1, 6).map((x) => {
-    return x[0];
-  }).join(", ");
+  return tempItems
+    .slice(1, 6)
+    .map((x) => {
+      return x[0];
+    })
+    .join(", ");
 };
 
 export const getMostSimLifeExp = (d) => {
   const { lifeExpSim } = d.properties;
   if (!lifeExpSim) return -1;
-  
-  var tempItems = Object.keys(lifeExpSim).map(function(key) {
+
+  var tempItems = Object.keys(lifeExpSim).map(function (key) {
     return [key, lifeExpSim[key]];
   });
-  
-  tempItems.sort(function(first, second) {
+
+  tempItems.sort(function (first, second) {
     return second[1] - first[1];
   });
 
-  return tempItems.slice(1, 6).map((x) => {
-    return x[0];
-  }).join(", ");
+  return tempItems
+    .slice(1, 6)
+    .map((x) => {
+      return x[0];
+    })
+    .join(", ");
 };
 
 export const getLinearScale = (values = [], range) =>
@@ -156,8 +162,51 @@ export const getAxisTickLabelProps =
     if (variant === AxisVariant.right) textAnchor = "start";
     return {
       fill: Text.Default,
-      fontSize: "0.875rem",
+      fontSize: "0.75rem",
       dy: variant === AxisVariant.bottom ? 0 : "0.33em",
       textAnchor,
     };
   };
+
+export const getMaleFemaleChartData = (country) => {
+  const countryProps = country?.object?.properties;
+  const maleData = {
+    id: "male",
+    label: "Male",
+    color: "blue",
+    datapoints: countryProps?.lifeExpMale?.map((yearData, index) => {
+      return {
+        valueY: yearData,
+        valueX: MIN_YEAR + index,
+      };
+    }),
+  };
+  const femaleData = {
+    id: "female",
+    label: "Female",
+    color: "pink",
+    datapoints: countryProps?.lifeExpFemale?.map((yearData, index) => {
+      return {
+        valueY: yearData,
+        valueX: MIN_YEAR + index,
+      };
+    }),
+  };
+  return [maleData, femaleData];
+};
+
+export const getGdpChartData = (country) => {
+  const countryProps = country?.object?.properties;
+  const data = {
+    id: "male",
+    label: "Male",
+    color: "blue",
+    datapoints: countryProps?.gdp?.map((yearData, index) => {
+      return {
+        valueY: yearData,
+        valueX: MIN_YEAR + index,
+      };
+    }),
+  };
+  return [data];
+};
