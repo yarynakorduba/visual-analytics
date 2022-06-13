@@ -1,4 +1,6 @@
 import React from "react";
+import tinycolor from "tinycolor2";
+
 import {
   getGdpPerCapita,
   getGdpPerCapitaPred,
@@ -12,6 +14,8 @@ import {
   getGdpChartData,
 } from "../utils";
 
+import { useCountriesWithColors } from "../hooks";
+
 import LineChart from "../LineChart";
 import Pill, { PillVariant } from "../Pill";
 import { MAX_YEAR } from "../consts";
@@ -23,7 +27,7 @@ const formatYScale = (d) => {
   const MILLION = 1000 * 1000;
   const BILLION = 1000 * MILLION;
   const TRILLION = 1000 * BILLION;
-  console.log("===>", d);
+
   if (d >= TRILLION) {
     return `${Math.round(d) / TRILLION}T`;
   }
@@ -40,7 +44,7 @@ const formatYScale = (d) => {
   return Math.round(d);
 };
 
-const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }) => {
+const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondChartLabel }) => {
   const name = country?.object?.properties?.ADMIN || "";
   const maleLifeExpectancy = getLifeExpMale(year)(country.object);
   const femaleLifeExpectancy = getLifeExpFemale(year)(country.object);
@@ -51,8 +55,12 @@ const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }
   const gdpPred = getGdpPerCapitaPred(country.object);
   const mostSimGdp = getMostSimGdp(country.object);
 
-  const firstChartData = getMaleFemaleChartData(country);
-  const secondChartData = getGdpChartData(country);
+  const countriesWithColors = useCountriesWithColors(countries);
+
+  const firstChartData = countriesWithColors?.length ? getMaleFemaleChartData(countriesWithColors) : [];
+  const secondChartData = countriesWithColors?.length ? getGdpChartData(countriesWithColors) : [];
+
+  console.log("COUNTRIES: ", countries, firstChartData);
 
   return (
     <div className="InfoPopup">
@@ -68,12 +76,14 @@ const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }
         formatXScale={formatXScale}
         formatYScale={formatYScale}
         height={250}
-        padding={{ top: 30, bottom: 30, left: 30, right: 15 }}
+        padding={{ top: 30, bottom: 30, left: 40, right: 15 }}
       />
-      <div className="InfoPopup__pills">
-        <Pill variant={PillVariant.male}>{maleLifeExpectancy} years</Pill>
-        <Pill variant={PillVariant.female}>{femaleLifeExpectancy} years</Pill>
-      </div>
+      {countries?.length <= 1 && (
+        <div className="InfoPopup__pills">
+          <Pill variant={PillVariant.male}>{maleLifeExpectancy} years</Pill>
+          <Pill variant={PillVariant.female}>{femaleLifeExpectancy} years</Pill>
+        </div>
+      )}
       <LineChart
         heading={secondChartLabel}
         data={secondChartData}
@@ -82,25 +92,48 @@ const InfoPopup = ({ year, country, onClose, firstChartLabel, secondChartLabel }
         formatXScale={formatXScale}
         formatYScale={formatYScale}
         height={250}
-        padding={{ top: 30, bottom: 30, left: 30, right: 15 }}
+        padding={{ top: 30, bottom: 30, left: 40, right: 15 }}
       />
-      <div className="InfoPopup__other">
-        <h3>Future Predictions (in 2030)</h3>
-        Average Life Expectancy:
-        {lifeExpPred >= lifeExpAll && <Pill variant={PillVariant.posTrend}>{lifeExpPred} years</Pill>}
-        {lifeExpPred < lifeExpAll && <Pill variant={PillVariant.negTrend}>{lifeExpPred} years</Pill>}
-        <br></br>
-        GDP per Capita:
-        {gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}
-        {gdpPred < gdpPerCapita && <Pill variant={PillVariant.negTrend}>${gdpPred}</Pill>}
-      </div>
-      <br></br>
-      <div className="InfoPopup__other">
-        <h3>Most Similar Countries</h3>
-        Average Life Expectancy: {mostSimLifeExp}
-        <br></br>
-        GDP per Capita: {mostSimGdp}
-      </div>
+      {countries?.length <= 1 ? (
+        <>
+          <div className="InfoPopup__other">
+            <h3 className="InfoPopup__subheading">Future Predictions (in 2030)</h3>
+            Average Life Expectancy:
+            {lifeExpPred >= lifeExpAll && <Pill variant={PillVariant.posTrend}>{lifeExpPred} years</Pill>}
+            {lifeExpPred < lifeExpAll && <Pill variant={PillVariant.negTrend}>{lifeExpPred} years</Pill>}
+            <br></br>
+            GDP per Capita:
+            {gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}
+            {gdpPred < gdpPerCapita && <Pill variant={PillVariant.negTrend}>${gdpPred}</Pill>}
+          </div>
+          <br></br>
+          <div className="InfoPopup__other">
+            <h3 className="InfoPopup__subheading">Most Similar Countries</h3>
+            Average Life Expectancy: {mostSimLifeExp}
+            <br></br>
+            GDP per Capita: {mostSimGdp}
+          </div>
+        </>
+      ) : (
+        <div className="InfoPopup__pills">
+          {countriesWithColors.map((country) => {
+            const name = country?.object?.properties?.ADMIN;
+            const chartColor = country?.object?.properties?.chartColor;
+            return (
+              <Pill
+                variant={PillVariant.custom}
+                style={{
+                  background: chartColor,
+                  color: tinycolor(chartColor).isDark() ? "white" : "black",
+                  margin: "0.25em",
+                }}
+              >
+                {name}
+              </Pill>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

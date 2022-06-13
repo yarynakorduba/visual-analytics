@@ -23,7 +23,12 @@
     border-radius: 10px;
     border: 3px solid rgb(44, 62, 80);
     text-align: left;
-    line-height: 1.35;
+    line-height: 1.5;
+    font-size: 1rem;
+  }
+
+  &__subheading {
+    margin: 0.125rem;
   }
 
   &__close {

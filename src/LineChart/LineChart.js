@@ -187,7 +187,7 @@ export default function ResponsiveLineChart({
     (parent) => {
       const responsiveWidth = !isNil(width) && Math.min(width, parent.width);
       const responsiveHeight = !isNil(height) && Math.min(height, parent.height);
-      console.log(">>>> ", responsiveHeight);
+
       return renderChart(responsiveWidth, responsiveHeight);
     },
     [renderChart, width, height]

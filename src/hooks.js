@@ -4,21 +4,19 @@ import { area, point } from "@turf/turf";
 import { GeoJsonLayer, TextLayer, ColumnLayer } from "@deck.gl/layers";
 import { scaleSequential } from "d3-scale";
 import { scaleLinear } from "@visx/scale";
-import { interpolateGreens, interpolateInferno, interpolateBlues, interpolatePuRd } from "d3-scale-chromatic";
+import { interpolateInferno, interpolateBlues, interpolatePuRd } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 import { isNil, keyBy } from "lodash";
 import {
   getLifeExpAll,
   getLifeExpFemale,
   getLifeExpMale,
-  getImmunRateDpt,
   getBandScale,
   getLinearScale,
   getInvertedBandScaleValue,
-  getGdpPerCapita,
   getGdp,
 } from "./utils";
-import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT } from "./consts";
+import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT, lineChartColorScheme } from "./consts";
 
 // DATASET
 export const useDataset = () => {
@@ -549,3 +547,15 @@ export const useMapViewState = () => {
 
   return { onViewStateChange, initViewState };
 };
+
+export const useCountriesWithColors = (countries = []) =>
+  countries.map((country) => ({
+    ...country,
+    object: {
+      ...country.object,
+      properties: {
+        ...country.object.properties,
+        chartColor: lineChartColorScheme[country.index % lineChartColorScheme.length],
+      },
+    },
+  }));

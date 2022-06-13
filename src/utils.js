@@ -168,45 +168,65 @@ export const getAxisTickLabelProps =
     };
   };
 
-export const getMaleFemaleChartData = (country) => {
-  const countryProps = country?.object?.properties;
-  const maleData = {
-    id: "male",
-    label: "Male",
-    color: "blue",
-    datapoints: countryProps?.lifeExpMale?.map((yearData, index) => {
-      return {
-        valueY: yearData,
-        valueX: MIN_YEAR + index,
-      };
-    }),
-  };
-  const femaleData = {
-    id: "female",
-    label: "Female",
-    color: "pink",
-    datapoints: countryProps?.lifeExpFemale?.map((yearData, index) => {
-      return {
-        valueY: yearData,
-        valueX: MIN_YEAR + index,
-      };
-    }),
-  };
-  return [maleData, femaleData];
+export const getMaleFemaleChartData = (countries = []) => {
+  if (countries.length === 1) {
+    const countryProps = countries[0]?.object?.properties;
+    const maleData = {
+      id: "male",
+      label: "Male",
+      color: "blue",
+      datapoints: countryProps?.lifeExpMale?.map((yearData, index) => {
+        return {
+          valueY: yearData,
+          valueX: MIN_YEAR + index,
+        };
+      }),
+    };
+    const femaleData = {
+      id: "female",
+      label: "Female",
+      color: "pink",
+      datapoints: countryProps?.lifeExpFemale?.map((yearData, index) => {
+        return {
+          valueY: yearData,
+          valueX: MIN_YEAR + index,
+        };
+      }),
+    };
+    return [maleData, femaleData];
+  }
+  return countries.map((country) => {
+    const countryProps = country?.object?.properties;
+
+    return {
+      id: "lifeExpAll",
+      label: `LifeExpectancy-${countryProps.ADMIN}`,
+      color: countryProps?.chartColor,
+      datapoints: countryProps?.lifeExpAll?.map((yearData, index) => {
+        return {
+          valueY: yearData,
+          valueX: MIN_YEAR + index,
+        };
+      }),
+    };
+  });
 };
 
-export const getGdpChartData = (country) => {
-  const countryProps = country?.object?.properties;
-  const data = {
-    id: "male",
-    label: "Male",
-    color: "blue",
-    datapoints: countryProps?.gdp?.map((yearData, index) => {
-      return {
-        valueY: yearData,
-        valueX: MIN_YEAR + index,
-      };
-    }),
-  };
-  return [data];
+export const getGdpChartData = (countries = []) => {
+  return countries.map((country) => {
+    const countryProps = country?.object?.properties;
+    console.log("--- >>> ", countryProps);
+    const data = {
+      id: `GDP-${countryProps.ADMIN}`,
+      label: "GDP",
+      color: countryProps?.chartColor,
+      datapoints: countryProps?.gdp?.map((yearData, index) => {
+        return {
+          valueY: yearData,
+          valueX: MIN_YEAR + index,
+        };
+      }),
+    };
+    return data;
+  });
 };

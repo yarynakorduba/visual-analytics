@@ -115,17 +115,12 @@ function WorldMap() {
         controller={true}
         getTooltip={displayTooltip}
       >
-        <Map
-          reuseMaps
-          preventStyleDiffing={true}
-          mapStyle={MAP_STYLE}
-          mapboxAccessToken={MAPBOX_TOKEN}
-          style={{ background: "red" }}
-        />
+        <Map reuseMaps preventStyleDiffing={true} mapStyle={MAP_STYLE} mapboxAccessToken={MAPBOX_TOKEN} />
       </DeckGL>
       {selectedCountries?.length ? (
         <InfoPopup
           country={selectedCountries?.[0]}
+          countries={selectedCountries}
           year={year}
           onClose={onDeselectCountries}
           firstChartLabel={"Life expectancy"}
