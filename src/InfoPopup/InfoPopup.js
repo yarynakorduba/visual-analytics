@@ -60,8 +60,6 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
   const firstChartData = countriesWithColors?.length ? getMaleFemaleChartData(countriesWithColors) : [];
   const secondChartData = countriesWithColors?.length ? getGdpChartData(countriesWithColors) : [];
 
-  console.log("COUNTRIES: ", countries, firstChartData);
-
   return (
     <div className="InfoPopup">
       <h2 className="InfoPopup__header">{name}</h2>

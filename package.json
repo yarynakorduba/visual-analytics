@@ -30,7 +30,6 @@
     "react-map-gl": "^7.0.11",
     "react-scripts": "5.0.1",
     "sass": "^1.52.1",
-    "tinycolor": "^0.0.1",
     "tinycolor2": "^1.4.2",
     "web-vitals": "^2.1.0"
   },

@@ -215,7 +215,6 @@ export const getMaleFemaleChartData = (countries = []) => {
 export const getGdpChartData = (countries = []) => {
   return countries.map((country) => {
     const countryProps = country?.object?.properties;
-    console.log("--- >>> ", countryProps);
     const data = {
       id: `GDP-${countryProps.ADMIN}`,
       label: "GDP",
