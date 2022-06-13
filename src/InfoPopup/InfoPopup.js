@@ -8,6 +8,8 @@ import {
   getLifeExpFemale,
   getLifeExpMale,
   getLifeExpPred,
+  getLifeExpFemalePred,
+  getLifeExpMalePred,
   getMostSimGdp,
   getMostSimLifeExp,
   getMaleFemaleChartData,
@@ -50,6 +52,8 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
   const femaleLifeExpectancy = getLifeExpFemale(year)(country.object);
   const lifeExpAll = getLifeExpAll(MAX_YEAR)(country.object);
   const lifeExpPred = getLifeExpPred(country.object);
+  const lifeExpFemalePred = getLifeExpFemalePred(country.object);
+  const lifeExpMalePred = getLifeExpMalePred(country.object);
   const mostSimLifeExp = getMostSimLifeExp(country.object);
   const gdpPerCapita = getGdpPerCapita(MAX_YEAR)(country.object);
   const gdpPred = getGdpPerCapitaPred(country.object);
@@ -97,8 +101,13 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
           <div className="InfoPopup__other">
             <h3 className="InfoPopup__subheading">Future Predictions (in 2030)</h3>
             Average Life Expectancy:
-            {lifeExpPred >= lifeExpAll && <Pill variant={PillVariant.posTrend}>{lifeExpPred} years</Pill>}
-            {lifeExpPred < lifeExpAll && <Pill variant={PillVariant.negTrend}>{lifeExpPred} years</Pill>}
+            <Pill variant={PillVariant.posTrend}>{lifeExpPred} years</Pill>
+            <br></br>
+            Life Expectancy Female:
+            <Pill variant={PillVariant.posTrend}>{lifeExpFemalePred} years</Pill>
+            <br></br>
+            Life Expectancy Male:
+            <Pill variant={PillVariant.posTrend}>{lifeExpMalePred} years</Pill>
             <br></br>
             GDP per Capita:
             {gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}

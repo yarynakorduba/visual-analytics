@@ -15,6 +15,7 @@ import {
   getLinearScale,
   getInvertedBandScaleValue,
   getGdp,
+  getGdpPerCapita,
 } from "./utils";
 import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT, lineChartColorScheme } from "./consts";
 
@@ -159,7 +160,7 @@ const seqColorScale = (colorScheme = ["#bfecd8", "#1A8828"], domain = [35, 90]) 
   scaleSequential(colorScheme).domain(domain);
 
 // GROUND LAYER
-export const useGeojsonLayer = (data, year, onClick, selectedCountries = [], getValue = getGdp) => {
+export const useGeojsonLayer = (data, year, onClick, selectedCountries = [], getValue = getGdpPerCapita) => {
   const indexedSelectedCountries = keyBy(selectedCountries, (country) => country.object?.properties?.ADMIN);
   const values = data ? data?.features?.map((d) => getValue(year)(d)).filter((d) => d !== -1) : [];
   const domain = values.length && [Math.min(...values), Math.max(...values)];
@@ -530,11 +531,6 @@ export const useMapViewState = () => {
   };
 
   const onViewStateChange = ({ viewState }) => {
-    if (viewState.longitude > 90) {
-      viewState.longitude = 90;
-    } else if (viewState.longitude < 0) {
-      viewState.longitude = 0;
-    }
     if (viewState.latitude > 90) {
       viewState.latitude = 90;
     } else if (viewState.latitude < 0) {

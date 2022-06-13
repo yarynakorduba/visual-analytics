@@ -42,7 +42,7 @@ function WorldMap() {
   const [year, setYear] = useState(MAX_YEAR);
   const [data] = useDataset();
   const [selectedCountries, setSelectedCountries] = useState([]);
-  const [colorIndicator, setColorIndicator] = useState(COLOR_INDICATORS.GDP);
+  const [colorIndicator, setColorIndicator] = useState(COLOR_INDICATORS.GDP_PER_CAPITA);
 
   const onToggleCountry = useCallback(
     (country) => {

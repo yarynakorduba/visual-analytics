@@ -59,6 +59,20 @@ export const getLifeExpPred = (d) => {
   return lifeExpPred;
 };
 
+// LifeExpFemale prediction for in 10 years
+export const getLifeExpFemalePred = (d) => {
+  const { lifeExpFemalePred } = d.properties;
+  if (!lifeExpFemalePred) return -1;
+  return lifeExpFemalePred;
+};
+
+// LifeExpMale prediction for in 10 years
+export const getLifeExpMalePred = (d) => {
+  const { lifeExpMalePred } = d.properties;
+  if (!lifeExpMalePred) return -1;
+  return lifeExpMalePred;
+};
+
 // GDP per Capita prediction for in 10 years
 export const getGdpPerCapitaPred = (d) => {
   const { gdpPred } = d.properties;
