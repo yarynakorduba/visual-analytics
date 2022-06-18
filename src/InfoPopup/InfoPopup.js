@@ -31,17 +31,17 @@ const formatYScale = (d) => {
   const TRILLION = 1000 * BILLION;
 
   if (d >= TRILLION) {
-    return `${Math.round(d) / TRILLION}T`;
+    return `${Math.round(d / TRILLION)}T`;
   }
   if (d >= BILLION) {
-    return `${Math.round(d) / BILLION}B`;
+    return `${Math.round(d / BILLION)}B`;
   }
   if (d >= MILLION) {
     // one million
-    return `${Math.round(d) / MILLION}MM`;
+    return `${Math.round(d / MILLION)}MM`;
   }
   if (d >= 1000) {
-    return `${Math.round(d) / 1000}K`;
+    return `${Math.round(d / 1000)}K`;
   }
   return Math.round(d);
 };
