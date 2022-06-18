@@ -47,7 +47,7 @@ export const useTextLifeExpAllLayer = (data, year) => {
       if ((lifeExpAll || 0) <= 0) return "";
       const countryCode = d.properties.ISO_A3;
       const countryArea = area(d.geometry);
-      return countryArea > MIN_AREA_TEXT_SHOWN ? `${countryCode} | ${Math.round(lifeExpAll)}y.` : "";
+      return countryArea > MIN_AREA_TEXT_SHOWN ? `${countryCode} | ${Math.round(lifeExpAll)} years` : "";
     },
     [year]
   );
@@ -102,9 +102,8 @@ export const useTextLifeExpGenderLayer = (data, year, layerId, offset, size) => 
       const lifeExpMale = getLifeExpMale(year)(d);
       const lifeExpFemale = getLifeExpFemale(year)(d);
       if (((lifeExpMale && lifeExpFemale) || 0) <= 0) return "";
-      const countryCode = d.properties.ISO_A3;
-      const countryArea = area(d.geometry);
-      return `${countryCode} \n M ${Math.round(lifeExpMale)}y.|F ${Math.round(lifeExpFemale)}y.`;
+      const country = d.properties.ADMIN;
+      return `${country} \n Men ${Math.round(lifeExpMale)} y. | Women ${Math.round(lifeExpFemale)} y.`;
     },
     [year]
   );

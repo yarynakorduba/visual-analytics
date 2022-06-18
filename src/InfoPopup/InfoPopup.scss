@@ -25,6 +25,9 @@
     text-align: left;
     line-height: 1.5;
     font-size: 1rem;
+    &--first {
+      margin-top: 1.5rem;
+    }
   }
 
   &__subheading {

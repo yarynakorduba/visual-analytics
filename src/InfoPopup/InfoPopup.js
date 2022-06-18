@@ -78,12 +78,12 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
         formatXScale={formatXScale}
         formatYScale={formatYScale}
         height={250}
-        padding={{ top: 30, bottom: 30, left: 40, right: 15 }}
+        padding={{ top: 30, bottom: 0, left: 40, right: 15 }}
       />
       {countries?.length <= 1 && (
         <div className="InfoPopup__pills">
-          <Pill variant={PillVariant.male}>{maleLifeExpectancy} years</Pill>
-          <Pill variant={PillVariant.female}>{femaleLifeExpectancy} years</Pill>
+          <Pill variant={PillVariant.male}>Men {maleLifeExpectancy} years</Pill>
+          <Pill variant={PillVariant.female}>Women {femaleLifeExpectancy} years</Pill>
         </div>
       )}
       <LineChart
@@ -94,11 +94,11 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
         formatXScale={formatXScale}
         formatYScale={formatYScale}
         height={250}
-        padding={{ top: 30, bottom: 30, left: 40, right: 15 }}
+        padding={{ top: 30, bottom: 0, left: 40, right: 15 }}
       />
       {countries?.length <= 1 ? (
         <>
-          <div className="InfoPopup__other">
+          <div className="InfoPopup__other InfoPopup__other--first">
             <h3 className="InfoPopup__subheading">Future Predictions (in 2030)</h3>
             Average Life Expectancy:
             <Pill variant={PillVariant.posTrend}>{lifeExpPred} years</Pill>

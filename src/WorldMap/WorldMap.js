@@ -64,7 +64,7 @@ function WorldMap() {
   }, [setSelectedCountries]);
 
   const textLifeExpAll = useTextLifeExpAllLayer(data, year);
-  const textLifeExpGender = useTextLifeExpGenderLayer(data, year, "textLifeExpGender", 1.2, 12);
+  const textLifeExpGender = useTextLifeExpGenderLayer(data, year, "textLifeExpGender", 1.2, 10);
   const textLifeExpGenderClose = useTextLifeExpGenderLayer(data, year, "textLifeExpGenderClose", 0.5, 12);
 
   const [geoJsonLayer, colorScale] = useGeojsonLayer(data, year, onToggleCountry, selectedCountries);
@@ -77,9 +77,9 @@ function WorldMap() {
   const displayTooltip = (info) => {
     if (!info || !info.object) return undefined;
 
-    if (info.layer?.id === "colLifeExpFemale") return `Female: ${Math.round(getLifeExpFemale(year)(info.object))}y.`;
-    if (info.layer?.id === "colLifeExpMale") return `Male: ${Math.round(getLifeExpMale(year)(info.object))}y.`;
-    if (info.layer?.id === "colLifeExpAll") return `Avg: ${Math.round(getLifeExpAll(year)(info.object))}y.`;
+    if (info.layer?.id === "colLifeExpFemale") return `Female: ${Math.round(getLifeExpFemale(year)(info.object))}years`;
+    if (info.layer?.id === "colLifeExpMale") return `Male: ${Math.round(getLifeExpMale(year)(info.object))}years`;
+    if (info.layer?.id === "colLifeExpAll") return `Avg: ${Math.round(getLifeExpAll(year)(info.object))}years`;
   };
 
   const filterLayers = ({ layer, viewport }) => {
