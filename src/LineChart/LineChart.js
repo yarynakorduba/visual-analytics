@@ -7,7 +7,7 @@ import React, { useCallback, useMemo } from "react";
 import { flatMap, flow, isNil, uniq } from "lodash";
 
 import ChartOverlays from "../ChartOverlays";
-import ChartTooltips from "../ChartTooltips";
+import ChartTooltips from "../ChartTooltips/ChartTooltips";
 import { useTooltipConfigs } from "../hooks";
 import { formatAxisTick, getAxisTickLabelProps, getLinearScale } from "../utils";
 import { ChartVariant, AxisVariant } from "../consts";
@@ -119,7 +119,7 @@ const LineChart = ({
               scale={xScale}
               hideTicks
               hideAxisLine
-              tickFormat={formatAxisTick(xTickWidth, formatXScale)}
+              tickFormat={formatAxisTick(formatXScale)}
               tickLabelProps={getAxisTickLabelProps()}
               numTicks={numXAxisTicks}
             />
@@ -127,7 +127,7 @@ const LineChart = ({
               scale={yScale}
               hideTicks
               hideAxisLine
-              tickFormat={formatAxisTick(padding.left, formatYScale)}
+              tickFormat={formatAxisTick(formatYScale)}
               tickLabelProps={getAxisTickLabelProps(AxisVariant.left)}
               numTicks={numYAxisTicks}
             />

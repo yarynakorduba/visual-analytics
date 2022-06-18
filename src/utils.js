@@ -155,18 +155,7 @@ export const getBandScale = (domain = [], range, padding = 0) =>
     padding,
   });
 
-export const formatAxisTick = (maxWidth, handler) => (text) => {
-  const formatted = handler ? handler(text) : text; // apply custom formatter
-  return formatted;
-  // return getClippedText(formatted, maxWidth, 5); // then clip text, if it's too long
-};
-
-export const getInvertedBandScaleValue = (scale, point, variant) => {
-  const step = scale?.step();
-  const index = Math.round((point + 0.5 * scale.bandwidth()) / step) - 1;
-  const domain = variant === ChartVariant.horizontal ? reverse(scale.domain()) : scale.domain();
-  return domain[index];
-};
+export const formatAxisTick = (handler) => (text) => handler ? handler(text) : text;
 
 export const getAxisTickLabelProps =
   (variant = AxisVariant.bottom) =>
@@ -194,6 +183,7 @@ export const getMaleFemaleChartData = (countries = []) => {
           return {
             valueY: yearData,
             valueX: MIN_YEAR + index,
+            text: `Men in ${MIN_YEAR + index}\n${yearData} years`,
           };
         })
         .filter((d) => d.valueX <= MAX_YEAR && d.valueX >= MIN_YEAR),
@@ -207,6 +197,7 @@ export const getMaleFemaleChartData = (countries = []) => {
           return {
             valueY: yearData,
             valueX: MIN_YEAR + index,
+            text: `Women in ${MIN_YEAR + index}\n${yearData} years`,
           };
         })
         .filter((d) => d.valueX <= MAX_YEAR && d.valueX >= MIN_YEAR),
@@ -225,6 +216,7 @@ export const getMaleFemaleChartData = (countries = []) => {
           return {
             valueY: yearData,
             valueX: MIN_YEAR + index,
+            text: `${countryProps.ADMIN} in ${MIN_YEAR + index}\n${yearData} years`,
           };
         })
         .filter((d) => d.valueX <= MAX_YEAR && d.valueX >= MIN_YEAR),
@@ -244,10 +236,18 @@ export const getGdpChartData = (countries = []) => {
           return {
             valueY: yearData,
             valueX: MIN_YEAR + index,
+            text: `${countryProps.ADMIN} in ${MIN_YEAR + index}\nGDP ${yearData}`,
           };
         })
         .filter((d) => d.valueX <= MAX_YEAR && d.valueX >= MIN_YEAR),
     };
     return data;
   });
+};
+// here
+export const getClosestCoordinate = (scale, point) => {
+  const scaleValue = Math.round(scale.invert(point));
+  const valueCoordinate = scale(scaleValue);
+  const bandMidCoordinate = valueCoordinate ? valueCoordinate : 0;
+  return [scaleValue, bandMidCoordinate];
 };

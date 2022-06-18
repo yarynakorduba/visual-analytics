@@ -4,6 +4,8 @@ import { Line, Bar } from "@visx/shape";
 import { localPoint } from "@visx/event";
 import { noop, isNil, map } from "lodash";
 
+import { useClosestPoints } from "./hooks";
+
 export default function ChartOverlays({
   height,
   width,
@@ -23,6 +25,7 @@ export default function ChartOverlays({
     [pointerCoords?.x, pointerCoords?.y]
   );
 
+  const closestPoints = useClosestPoints(mouseEvent, xScale, yScale, dataSeries, variant, offsetTop, offsetLeft);
   const handleHover = useCallback(
     (pointGroup) => (event) => {
       const { x, y } = localPoint(event.target, event) || {
@@ -33,6 +36,7 @@ export default function ChartOverlays({
         x: x ? x - offsetLeft : 0,
         y: y ? y - offsetTop : 0,
       });
+
       setMouseEvent(event);
       onHover(event, pointGroup);
     },
@@ -53,6 +57,55 @@ export default function ChartOverlays({
     [onMouseLeave]
   );
 
+  const renderDataPointIndicators = useCallback(
+    () =>
+      map(closestPoints, (pointGroup) => {
+        if (!pointGroup) return null;
+        const { points, x: pX, y: pY } = pointGroup;
+        const lastPointColor = points?.[points?.length - 1]?.color;
+        const hover = handleHover(pointGroup);
+        const leave = handleMouseLeave(pointGroup);
+        return (
+          <>
+            <circle
+              key={`c1-${pX}-${pY}`}
+              cx={pX}
+              cy={pY}
+              r={7.5}
+              pointerEvents="all"
+              onMouseEnter={hover}
+              onMouseMove={hover}
+              onMouseLeave={leave}
+              fill={"gray"}
+            />
+            <circle
+              key={`c2-${pX}-${pY}`}
+              cx={pX}
+              cy={pY}
+              r={6.5}
+              pointerEvents="all"
+              onMouseEnter={hover}
+              onMouseMove={hover}
+              onMouseLeave={leave}
+              fill={"white"}
+            />
+            <circle
+              key={`c3-${pX}-${pY}`}
+              cx={pX}
+              cy={pY}
+              r={4.5}
+              pointerEvents="all"
+              onMouseEnter={hover}
+              onMouseMove={hover}
+              onMouseLeave={leave}
+              fill={lastPointColor}
+            />
+          </>
+        );
+      }),
+    [closestPoints, handleHover, handleMouseLeave]
+  );
+
   return (
     <Group width={width} height={height} top={offsetTop} left={offsetLeft}>
       <Bar
@@ -71,7 +124,7 @@ export default function ChartOverlays({
             stroke={"red"}
             strokeWidth={1}
             pointerEvents="none"
-            strokeDasharray="3,2"
+            strokeDasharray="3,6"
           />
           <Line
             from={{ x: 0, y: pointerCoords?.y }}
@@ -82,8 +135,9 @@ export default function ChartOverlays({
             stroke={"red"}
             strokeWidth={1}
             pointerEvents="none"
-            strokeDasharray="3,2"
+            strokeDasharray="3,6"
           />
+          {renderDataPointIndicators()}
         </Group>
       )}
     </Group>

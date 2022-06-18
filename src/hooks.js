@@ -7,17 +7,19 @@ import { scaleLinear } from "@visx/scale";
 import { interpolateInferno, interpolateBlues, interpolatePuRd } from "d3-scale-chromatic";
 import hexRgb from "hex-rgb";
 import { isNil, keyBy } from "lodash";
+import { localPoint } from "@visx/event";
+
 import {
   getLifeExpAll,
   getLifeExpFemale,
   getLifeExpMale,
   getBandScale,
   getLinearScale,
-  getInvertedBandScaleValue,
   getGdp,
   getGdpPerCapita,
+  getClosestCoordinate,
 } from "./utils";
-import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT, lineChartColorScheme } from "./consts";
+import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT, lineChartColorScheme, ChartVariant } from "./consts";
 
 // DATASET
 export const useDataset = () => {
@@ -449,15 +451,12 @@ export const useTooltipConfigs = (
     setXTooltip(noTooltipData);
   };
 
-  const getAxisTooltipData = useCallback(
-    (scale, isScaleLinear, formatter, coordinate) => {
-      if (isNil(coordinate)) return undefined;
-      const value = isScaleLinear ? scale.invert(coordinate) : getInvertedBandScaleValue(scale, coordinate, variant);
+  const getAxisTooltipData = useCallback((scale, isScaleLinear, formatter, coordinate) => {
+    if (isNil(coordinate)) return undefined;
+    const value = scale.invert(coordinate);
 
-      return formatter ? formatter(value) : value;
-    },
-    [variant]
-  );
+    return formatter ? formatter(value) : value;
+  }, []);
 
   const handleHover = useCallback(
     (event, pointGroup) => {
@@ -489,18 +488,7 @@ export const useTooltipConfigs = (
         ),
       });
     },
-    [
-      containerBounds,
-      xPadding,
-      getAxisTooltipData,
-      yScale,
-      variant,
-      formatYScale,
-      yPadding,
-      chartHeight,
-      xScale,
-      formatXScale,
-    ]
+    [containerBounds, xPadding, getAxisTooltipData, yScale, formatYScale, yPadding, chartHeight, xScale, formatXScale]
   );
 
   return {
@@ -554,3 +542,59 @@ export const useCountriesWithColors = (countries = []) =>
       },
     },
   }));
+
+export function useClosestPoints(event, xScale, yScale, series = [], variant, yPadding = 15, xPadding = 15) {
+  const [closestPoints, setClosestPoints] = useState();
+
+  const addPoint = useCallback((accum = [], color, data, x, y) => {
+    const pointGroupId = `${x}-${y}`;
+    const pointGroup = accum[pointGroupId] ?? { x, y };
+    const points = pointGroup?.points ?? [];
+    const point = {
+      color,
+      data,
+    };
+    return {
+      ...accum,
+      [pointGroupId]: {
+        ...pointGroup,
+        points: [...points, point],
+      },
+    };
+  }, []);
+
+  const handleSetPoints = useCallback(() => {
+    if (!event || !event.target || !xScale || !yScale) {
+      setClosestPoints(undefined);
+      return;
+    }
+
+    const targetName = event?.target?.localName;
+    if (targetName !== "path" && targetName !== "rect") return;
+
+    const { y, x } = localPoint(event) || { x: 0, y: 0 };
+    let points;
+
+    const [xValue, xCoordinate] = getClosestCoordinate(xScale, x - xPadding, ChartVariant.vertical);
+
+    // Find all the corresponding linear coord based on band coord
+    points = series.reduce((accum, serie) => {
+      const { datapoints = [], color } = serie;
+      const data = datapoints.find((datum) => datum.valueX === xValue);
+      if (isNil(data)) return accum;
+
+      let yVal = data?.valueY;
+      const yCoordinate = yScale(yVal);
+      if (isNil(yCoordinate)) return accum;
+      return addPoint(accum, color, data, xCoordinate, yCoordinate);
+    }, []);
+
+    setClosestPoints(points);
+  }, [addPoint, event, series, xPadding, xScale, yScale]);
+
+  useEffect(() => {
+    handleSetPoints();
+  }, [handleSetPoints]);
+
+  return closestPoints;
+}

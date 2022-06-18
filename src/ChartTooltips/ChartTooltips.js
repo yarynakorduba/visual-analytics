@@ -2,6 +2,8 @@ import React, { useCallback } from "react";
 import { defaultStyles, Tooltip, TooltipWithBounds } from "@visx/tooltip";
 import { isNil, map } from "lodash";
 
+import "./ChartTooltips.scss";
+
 const pointTooltipStyles = {
   ...defaultStyles,
   minWidth: "2rem",
@@ -42,15 +44,13 @@ function TooltipDatumIndicator({ color }) {
 }
 
 export default function ChartTooltips({ pointTooltip, xTooltip, yTooltip }) {
+  // console.log("===pointTooltip=> ", pointTooltip);
   const renderPointTooltipText = useCallback(
     () =>
       map(pointTooltip?.tooltipData, (point) => (
-        <div key={point?.data?.id}>
+        <div className="ChartTooltips__content" key={point?.data?.id}>
           <TooltipDatumIndicator color={point?.color} />
-          {point?.data?.text?.map((str, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <span key={index}>{str} </span>
-          ))}
+          <div className="ChartTooltips__text">{point.data.text}</div>
         </div>
       )),
     [pointTooltip]
@@ -65,7 +65,7 @@ export default function ChartTooltips({ pointTooltip, xTooltip, yTooltip }) {
       const TooltipComponent = isTooltipForPoint ? TooltipWithBounds : Tooltip;
       return (
         <TooltipComponent top={tooltip?.tooltipTop} left={tooltip?.tooltipLeft} style={styles}>
-          <div>{isTooltipForPoint ? renderPointTooltipText() : tooltip?.tooltipData}</div>
+          {isTooltipForPoint ? renderPointTooltipText() : tooltip?.tooltipData}
         </TooltipComponent>
       );
     },
