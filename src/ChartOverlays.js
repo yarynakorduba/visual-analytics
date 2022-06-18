@@ -2,7 +2,7 @@ import React, { useCallback, useState, useMemo } from "react";
 import { Group } from "@visx/group";
 import { Line, Bar } from "@visx/shape";
 import { localPoint } from "@visx/event";
-import { noop, isNil, map } from "lodash";
+import { noop, map } from "lodash";
 
 import { useClosestPoints } from "./hooks";
 
@@ -25,7 +25,7 @@ export default function ChartOverlays({
     [pointerCoords?.x, pointerCoords?.y]
   );
 
-  const closestPoints = useClosestPoints(mouseEvent, xScale, yScale, dataSeries, variant, offsetTop, offsetLeft);
+  const closestPoints = useClosestPoints(mouseEvent, xScale, yScale, dataSeries, offsetLeft);
   const handleHover = useCallback(
     (pointGroup) => (event) => {
       const { x, y } = localPoint(event.target, event) || {

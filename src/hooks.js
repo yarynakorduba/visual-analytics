@@ -543,7 +543,7 @@ export const useCountriesWithColors = (countries = []) =>
     },
   }));
 
-export function useClosestPoints(event, xScale, yScale, series = [], variant, yPadding = 15, xPadding = 15) {
+export function useClosestPoints(event, xScale, yScale, series = [], xPadding = 15) {
   const [closestPoints, setClosestPoints] = useState();
 
   const addPoint = useCallback((accum = [], color, data, x, y) => {
