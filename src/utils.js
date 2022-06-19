@@ -80,6 +80,20 @@ export const getGdpPerCapitaPred = (d) => {
   return gdpPred;
 };
 
+// Spearman correlation between lifeExpAll and GdpPerCapita
+export const getLifeExpGdpCorrS = (d) => {
+  const { lifeExpGdpCorrS } = d.properties;
+  if (!lifeExpGdpCorrS) return -1;
+  return lifeExpGdpCorrS.toFixed(2);
+};
+
+// Pearson correlation between lifeExpAll and GdpPerCapita
+export const getLifeExpGdpCorrP = (d) => {
+  const { lifeExpGdpCorrP } = d.properties;
+  if (!lifeExpGdpCorrP) return -1;
+  return lifeExpGdpCorrP.toFixed(2);
+};
+
 // LifeExpAll similiarty value in comparison with other countries --> index = countrycode
 export const getLifeExpSim = (otherCountryCode) => (d) => {
   const { lifeExpSim } = d.properties;

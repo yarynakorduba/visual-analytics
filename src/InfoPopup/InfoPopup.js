@@ -14,6 +14,8 @@ import {
   getMostSimLifeExp,
   getMaleFemaleChartData,
   getGdpChartData,
+  getLifeExpGdpCorrS,
+  getLifeExpGdpCorrP,
 } from "../utils";
 
 import { useCountriesWithColors } from "../hooks";
@@ -58,6 +60,8 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
   const gdpPerCapita = getGdpPerCapita(MAX_YEAR)(country.object);
   const gdpPred = getGdpPerCapitaPred(country.object);
   const mostSimGdp = getMostSimGdp(country.object);
+  const lifeExpGdpCorrS = getLifeExpGdpCorrS(country.object);
+  const lifeExpGdpCorrP = getLifeExpGdpCorrP(country.object);
 
   const countriesWithColors = useCountriesWithColors(countries);
 
@@ -84,6 +88,13 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
         <div className="InfoPopup__pills">
           <Pill variant={PillVariant.male}>Men {maleLifeExpectancy} years</Pill>
           <Pill variant={PillVariant.female}>Women {femaleLifeExpectancy} years</Pill>
+        </div>
+      )}
+      {countries?.length <= 1 && (
+        <div className="InfoPopup__pills">
+          {lifeExpGdpCorrS >= 0.8 && <Pill variant={PillVariant.posTrend}>High Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})</Pill>}
+          {lifeExpGdpCorrS < 0.8 && lifeExpGdpCorrS > 0.5 && <Pill variant={PillVariant.custom}>Medium Correlation: P ({lifeExpGdpCorrP}) Sp {lifeExpGdpCorrS})</Pill>}
+          {lifeExpGdpCorrS < 0.5 && <Pill variant={PillVariant.negTrend}>Low Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})</Pill>}
         </div>
       )}
       <LineChart
@@ -113,7 +124,6 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
             {gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}
             {gdpPred < gdpPerCapita && <Pill variant={PillVariant.negTrend}>${gdpPred}</Pill>}
           </div>
-          <br></br>
           <div className="InfoPopup__other">
             <h3 className="InfoPopup__subheading">Most Similar Countries</h3>
             Average Life Expectancy: {mostSimLifeExp}
