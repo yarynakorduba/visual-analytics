@@ -12,7 +12,6 @@ export default function ChartOverlays({
   xScale,
   yScale,
   dataSeries,
-  variant,
   offsetLeft = 0,
   offsetTop = 0,
   onHover = noop,
