@@ -14,8 +14,11 @@ import {
   getMostSimLifeExp,
   getMaleFemaleChartData,
   getGdpChartData,
+  getImmuChartData,
   getLifeExpGdpCorrS,
   getLifeExpGdpCorrP,
+  getLifeExpImmunCorrS,
+  getLifeExpImmunCorrP
 } from "../utils";
 
 import { useCountriesWithColors } from "../hooks";
@@ -49,7 +52,7 @@ const formatYScale = (d) => {
 };
 
 const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondChartLabel }) => {
-  const name = country?.object?.properties?.ADMIN || "";
+  const name = countries.length === 1 ? country?.object?.properties?.ADMIN || "" : countries.map((c) => c?.object?.properties?.ADMIN).join(' - ');
   const maleLifeExpectancy = getLifeExpMale(year)(country.object);
   const femaleLifeExpectancy = getLifeExpFemale(year)(country.object);
   const lifeExpAll = getLifeExpAll(MAX_YEAR)(country.object);
@@ -62,11 +65,16 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
   const mostSimGdp = getMostSimGdp(country.object);
   const lifeExpGdpCorrS = getLifeExpGdpCorrS(country.object);
   const lifeExpGdpCorrP = getLifeExpGdpCorrP(country.object);
+  const lifeExpImmuCorrS = getLifeExpImmunCorrS(country.object);
+  const lifeExpImmuCorrP = getLifeExpImmunCorrP(country.object);
+  
 
   const countriesWithColors = useCountriesWithColors(countries);
 
   const firstChartData = countriesWithColors?.length ? getMaleFemaleChartData(countriesWithColors) : [];
-  const secondChartData = countriesWithColors?.length ? getGdpChartData(countriesWithColors) : [];
+  const secondChartData = countriesWithColors?.length ? 
+                          (secondChartLabel !== "Immunization" ? getGdpChartData(countriesWithColors) : getImmuChartData(countriesWithColors)) 
+                          : [];
 
   return (
     <div className="InfoPopup">
@@ -90,11 +98,18 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
           <Pill variant={PillVariant.female}>Women {femaleLifeExpectancy} years</Pill>
         </div>
       )}
-      {countries?.length <= 1 && (
+      {(countries?.length <= 1 && secondChartLabel !== "Immunization") && (
         <div className="InfoPopup__pills">
           {lifeExpGdpCorrS >= 0.8 && <Pill variant={PillVariant.posTrend}>High Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})</Pill>}
           {lifeExpGdpCorrS < 0.8 && lifeExpGdpCorrS > 0.5 && <Pill variant={PillVariant.custom}>Medium Correlation: P ({lifeExpGdpCorrP}) Sp {lifeExpGdpCorrS})</Pill>}
           {lifeExpGdpCorrS < 0.5 && <Pill variant={PillVariant.negTrend}>Low Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})</Pill>}
+        </div>
+      )}
+      {(countries?.length <= 1 && secondChartLabel === "Immunization") && (
+        <div className="InfoPopup__pills">
+          {lifeExpGdpCorrS >= 0.8 && <Pill variant={PillVariant.posTrend}>High Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
+          {lifeExpGdpCorrS < 0.8 && lifeExpGdpCorrS > 0.5 && <Pill variant={PillVariant.custom}>Medium Correlation: P ({lifeExpImmuCorrP}) Sp {lifeExpImmuCorrS})</Pill>}
+          {lifeExpGdpCorrS < 0.5 && <Pill variant={PillVariant.negTrend}>Low Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
         </div>
       )}
       <LineChart
@@ -120,9 +135,13 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
             Life Expectancy Male:
             <Pill variant={PillVariant.posTrend}>{lifeExpMalePred} years</Pill>
             <br></br>
-            GDP per Capita:
-            {gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}
-            {gdpPred < gdpPerCapita && <Pill variant={PillVariant.negTrend}>${gdpPred}</Pill>}
+            {secondChartLabel !== "Immunization" && (
+              <div>
+                GDP per Capita:
+                {gdpPred >= gdpPerCapita && <Pill variant={PillVariant.posTrend}>${gdpPred}</Pill>}
+                {gdpPred < gdpPerCapita && <Pill variant={PillVariant.negTrend}>${gdpPred}</Pill>}
+              </div>
+            )}
           </div>
           <div className="InfoPopup__other">
             <h3 className="InfoPopup__subheading">Most Similar Countries</h3>

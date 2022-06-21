@@ -21,6 +21,7 @@ import {
   getLifeExpFemale,
   getLifeExpMale,
   getGdpChartData,
+  getImmunDptSim,
 } from "../utils";
 
 import InfoPopup from "../InfoPopup/InfoPopup";
@@ -59,6 +60,17 @@ function WorldMap() {
     [selectedCountries]
   );
 
+  const onSwitchMetric = useCallback(
+    () => {
+      if(colorIndicator === COLOR_INDICATORS.IMMUNIZATION){
+        setColorIndicator(COLOR_INDICATORS.GDP_PER_CAPITA);
+      }else{
+        setColorIndicator(COLOR_INDICATORS.IMMUNIZATION);
+      }
+    },
+    [colorIndicator]
+  );
+
   const onDeselectCountries = useCallback(() => {
     setSelectedCountries([]);
   }, [setSelectedCountries]);
@@ -67,7 +79,8 @@ function WorldMap() {
   const textLifeExpGender = useTextLifeExpGenderLayer(data, year, "textLifeExpGender", 1.2, 10);
   const textLifeExpGenderClose = useTextLifeExpGenderLayer(data, year, "textLifeExpGenderClose", 0.5, 12);
 
-  const [geoJsonLayer, colorScale] = useGeojsonLayer(data, year, onToggleCountry, selectedCountries);
+  const [geoJsonImmuLayer, colorScaleImmu] = useGeojsonLayer(data, year, "immuGround", onToggleCountry, selectedCountries, getImmunRateDpt);
+  const [geoJsonGDPLayer, colorScaleGdp] = useGeojsonLayer(data, year, "gdpGround", onToggleCountry, selectedCountries, getGdpPerCapita);
   const colLifeExpAll = useColLifeExpAllLayer(data, year);
   const colLifeExpMale = useColLifeExpMaleLayer(data, year, "colLifeExpMale", 15000, 0.5, -0.5);
   const colLifeExpFemale = useColLifeExpFemaleLayer(data, year, "colLifeExpFemale", 15000, 0.5, 0.5);
@@ -83,6 +96,8 @@ function WorldMap() {
   };
 
   const filterLayers = ({ layer, viewport }) => {
+    if (layer.id === "immuGround") return colorIndicator === COLOR_INDICATORS.IMMUNIZATION;
+    if (layer.id === "gdpGround") return colorIndicator === COLOR_INDICATORS.GDP_PER_CAPITA;
     if (layer.id === "textLifeExpAll") return viewport.zoom > 3 && viewport.zoom <= 4;
     if (layer.id === "textLifeExpGender") return viewport.zoom > 4;
 
@@ -95,7 +110,8 @@ function WorldMap() {
   };
 
   const layers = [
-    geoJsonLayer,
+    geoJsonImmuLayer,
+    geoJsonGDPLayer,
     textLifeExpAll,
     textLifeExpGender,
     colLifeExpAll,
@@ -103,7 +119,7 @@ function WorldMap() {
     colLifeExpFemale,
   ].filter((l) => l);
 
-  if (!geoJsonLayer || !data?.features) return <div className="WorldMap__loader">Loading...</div>;
+  if (!geoJsonGDPLayer || !data?.features) return <div className="WorldMap__loader">Loading...</div>;
 
   return (
     <div>
@@ -127,7 +143,7 @@ function WorldMap() {
           secondChartLabel={colorIndicator?.label}
         />
       ) : null}
-      <MapLegend scale={colorScale} label={colorIndicator?.label} />
+      <MapLegend scale={colorIndicator === COLOR_INDICATORS.GDP_PER_CAPITA ? colorScaleGdp : colorScaleImmu} label={colorIndicator?.label} onSwitchMetric={onSwitchMetric}  />
     </div>
   );
 }

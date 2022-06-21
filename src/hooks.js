@@ -18,6 +18,7 @@ import {
   getGdp,
   getGdpPerCapita,
   getClosestCoordinate,
+  getImmunRateDpt,
 } from "./utils";
 import { MIN_AREA_TEXT_SHOWN, GRAY, WHITE_TRANSPARENT, lineChartColorScheme, ChartVariant } from "./consts";
 
@@ -161,10 +162,10 @@ const seqColorScale = (colorScheme = ["#bfecd8", "#1A8828"], domain = [35, 90]) 
   scaleSequential(colorScheme).domain(domain);
 
 // GROUND LAYER
-export const useGeojsonLayer = (data, year, onClick, selectedCountries = [], getValue = getGdpPerCapita) => {
+export const useGeojsonLayer = (data, year, layerId, onClick, selectedCountries = [], getValue) => {
   const indexedSelectedCountries = keyBy(selectedCountries, (country) => country.object?.properties?.ADMIN);
   const values = data ? data?.features?.map((d) => getValue(year)(d)).filter((d) => d !== -1) : [];
-  const domain = values.length && [Math.min(...values), Math.max(...values)];
+  const domain = values.length && [Math.min(...values), Math.min(75000,Math.max(...values))];
 
   const colorScale = domain && linColorScale(["#bfecd8", "#1A8828"], domain);
 
@@ -197,7 +198,7 @@ export const useGeojsonLayer = (data, year, onClick, selectedCountries = [], get
   const layer = useMemo(
     () =>
       new GeoJsonLayer({
-        id: "ground-layer",
+        id: layerId,
         data,
         stroked: true,
         getLineWidth: 1,
@@ -518,10 +519,10 @@ export const useMapViewState = () => {
   };
 
   const onViewStateChange = ({ viewState }) => {
-    if (viewState.latitude > 90) {
-      viewState.latitude = 90;
-    } else if (viewState.latitude < 0) {
-      viewState.latitude = 0;
+    if (viewState.latitude > 75) {
+      viewState.latitude = 75;
+    } else if (viewState.latitude < -45) {
+      viewState.latitude = -45;
     }
 
     // update mapbox

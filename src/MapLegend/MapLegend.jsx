@@ -1,11 +1,12 @@
 import { LegendLinear, LegendItem } from "@visx/legend";
+import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
 
 import "./MapLegend.scss";
 
 const legendGlyphHeight = 20;
 const legendGlyphWidth = 60;
 
-const MapLegend = ({ scale, label }) => {
+const MapLegend = ({ scale, label, onSwitchMetric }) => {
   return (
     // <LegendDemo title="Threshold">
     <div className="MapLegend">
@@ -21,7 +22,7 @@ const MapLegend = ({ scale, label }) => {
                     <g>
                       <rect fill={label.value} x={0} y={0} width={width} height={legendGlyphHeight} />
                       <text x="50%" y="50%" className={"MapLegend__label"}>
-                        {Math.round(label.text)}
+                        {Math.round(label.text)}{i === labels.length-1 ? '+' : ''}
                       </text>
                     </g>
                   </svg>
@@ -31,6 +32,7 @@ const MapLegend = ({ scale, label }) => {
           </div>
         )}
       </LegendLinear>
+      <ToggleSwitch id="ground" checked={ label !== "Immunization" } onChange={ onSwitchMetric }/>
     </div>
   );
 };

@@ -94,6 +94,20 @@ export const getLifeExpGdpCorrP = (d) => {
   return lifeExpGdpCorrP.toFixed(2);
 };
 
+// Spearman correlation between lifeExpAll and Immunization
+export const getLifeExpImmunCorrS = (d) => {
+  const { lifeExpImmunCorrS } = d.properties;
+  if (!lifeExpImmunCorrS) return -1;
+  return lifeExpImmunCorrS.toFixed(2);
+};
+
+// Pearson correlation between lifeExpAll and Immunization
+export const getLifeExpImmunCorrP = (d) => {
+  const { lifeExpImmunCorrP } = d.properties;
+  if (!lifeExpImmunCorrP) return -1;
+  return lifeExpImmunCorrP.toFixed(2);
+};
+
 // LifeExpAll similiarty value in comparison with other countries --> index = countrycode
 export const getLifeExpSim = (otherCountryCode) => (d) => {
   const { lifeExpSim } = d.properties;
@@ -243,7 +257,7 @@ export const getGdpChartData = (countries = []) => {
     const countryProps = country?.object?.properties;
     const data = {
       id: `GDP-${countryProps.ADMIN}`,
-      label: "GDP",
+      label: `GDP-${countryProps.ADMIN}`,
       color: countryProps?.chartColor,
       datapoints: countryProps?.gdpPerCapita
         ?.map((yearData, index) => {
@@ -251,6 +265,27 @@ export const getGdpChartData = (countries = []) => {
             valueY: yearData,
             valueX: MIN_YEAR + index,
             text: `${countryProps.ADMIN} in ${MIN_YEAR + index}\nGDP ${yearData}`,
+          };
+        })
+        .filter((d) => d.valueX <= MAX_YEAR && d.valueX >= MIN_YEAR),
+    };
+    return data;
+  });
+};
+
+export const getImmuChartData = (countries = []) => {
+  return countries.map((country) => {
+    const countryProps = country?.object?.properties;
+    const data = {
+      id: `IM-${countryProps.ADMIN}`,
+      label: `IMMU-${countryProps.ADMIN}`,
+      color: countryProps?.chartColor,
+      datapoints: countryProps?.immunDpt
+        ?.map((yearData, index) => {
+          return {
+            valueY: yearData,
+            valueX: MIN_YEAR + index,
+            text: `${countryProps.ADMIN} in ${MIN_YEAR + index}\nImmunization ${yearData}`,
           };
         })
         .filter((d) => d.valueX <= MAX_YEAR && d.valueX >= MIN_YEAR),
