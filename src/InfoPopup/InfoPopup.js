@@ -18,7 +18,8 @@ import {
   getLifeExpGdpCorrS,
   getLifeExpGdpCorrP,
   getLifeExpImmunCorrS,
-  getLifeExpImmunCorrP
+  getLifeExpImmunCorrP,
+  getMostSimImmunDpt
 } from "../utils";
 
 import { useCountriesWithColors } from "../hooks";
@@ -63,6 +64,7 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
   const gdpPerCapita = getGdpPerCapita(MAX_YEAR)(country.object);
   const gdpPred = getGdpPerCapitaPred(country.object);
   const mostSimGdp = getMostSimGdp(country.object);
+  const mostSimImmunDpt = getMostSimImmunDpt(country.object);
   const lifeExpGdpCorrS = getLifeExpGdpCorrS(country.object);
   const lifeExpGdpCorrP = getLifeExpGdpCorrP(country.object);
   const lifeExpImmuCorrS = getLifeExpImmunCorrS(country.object);
@@ -107,9 +109,9 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
       )}
       {(countries?.length <= 1 && secondChartLabel === "Immunization") && (
         <div className="InfoPopup__pills">
-          {lifeExpGdpCorrS >= 0.8 && <Pill variant={PillVariant.posTrend}>High Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
-          {lifeExpGdpCorrS < 0.8 && lifeExpGdpCorrS > 0.5 && <Pill variant={PillVariant.custom}>Medium Correlation: P ({lifeExpImmuCorrP}) Sp {lifeExpImmuCorrS})</Pill>}
-          {lifeExpGdpCorrS < 0.5 && <Pill variant={PillVariant.negTrend}>Low Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
+          {lifeExpImmuCorrS >= 0.8 && <Pill variant={PillVariant.posTrend}>High Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
+          {lifeExpImmuCorrS < 0.8 && lifeExpImmuCorrS > 0.5 && <Pill variant={PillVariant.custom}>Medium Correlation: P ({lifeExpImmuCorrP}) Sp {lifeExpImmuCorrS})</Pill>}
+          {lifeExpImmuCorrS < 0.5 && <Pill variant={PillVariant.negTrend}>Low Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
         </div>
       )}
       <LineChart
@@ -143,12 +145,22 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
               </div>
             )}
           </div>
-          <div className="InfoPopup__other">
-            <h3 className="InfoPopup__subheading">Most Similar Countries</h3>
-            Average Life Expectancy: {mostSimLifeExp}
-            <br></br>
-            GDP per Capita: {mostSimGdp}
-          </div>
+          {secondChartLabel !== "Immunization" && (
+            <div className="InfoPopup__other">
+              <h3 className="InfoPopup__subheading">Most Similar Countries</h3>
+              Average Life Expectancy: {mostSimLifeExp}
+              <br></br>
+              GDP per Capita: {mostSimGdp}
+            </div>
+          )}
+          {secondChartLabel === "Immunization" && (
+             <div className="InfoPopup__other">
+              <h3 className="InfoPopup__subheading">Most Similar Countries</h3>
+              Average Life Expectancy: {mostSimLifeExp}
+              <br></br>
+              Immunization DPT: {mostSimImmunDpt}
+            </div>
+          )}
         </>
       ) : (
         <div className="InfoPopup__pills">

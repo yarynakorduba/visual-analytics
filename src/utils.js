@@ -169,6 +169,26 @@ export const getMostSimLifeExp = (d) => {
     .join(", ");
 };
 
+export const getMostSimImmunDpt = (d) => {
+  const { immunDptSim } = d.properties;
+  if (!immunDptSim) return -1;
+
+  var tempItems = Object.keys(immunDptSim).map(function (key) {
+    return [key, immunDptSim[key]];
+  });
+
+  tempItems.sort(function (first, second) {
+    return second[1] - first[1];
+  });
+
+  return tempItems
+    .slice(1, 6)
+    .map((x) => {
+      return x[0];
+    })
+    .join(", ");
+};
+
 export const getLinearScale = (values = [], range) =>
   scaleLinear({
     domain: [Math.min(...values), Math.max(...values)],
