@@ -19,7 +19,7 @@ import {
   getLifeExpGdpCorrP,
   getLifeExpImmunCorrS,
   getLifeExpImmunCorrP,
-  getMostSimImmunDpt
+  getMostSimImmunDpt,
 } from "../utils";
 
 import { useCountriesWithColors } from "../hooks";
@@ -53,7 +53,7 @@ const formatYScale = (d) => {
 };
 
 const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondChartLabel }) => {
-  const name = countries.length === 1 ? country?.object?.properties?.ADMIN || "" : countries.map((c) => c?.object?.properties?.ADMIN).join(' - ');
+  const name = countries.length === 1 ? country?.object?.properties?.ADMIN || "" : "";
   const maleLifeExpectancy = getLifeExpMale(year)(country.object);
   const femaleLifeExpectancy = getLifeExpFemale(year)(country.object);
   const lifeExpAll = getLifeExpAll(MAX_YEAR)(country.object);
@@ -69,14 +69,15 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
   const lifeExpGdpCorrP = getLifeExpGdpCorrP(country.object);
   const lifeExpImmuCorrS = getLifeExpImmunCorrS(country.object);
   const lifeExpImmuCorrP = getLifeExpImmunCorrP(country.object);
-  
 
   const countriesWithColors = useCountriesWithColors(countries);
 
   const firstChartData = countriesWithColors?.length ? getMaleFemaleChartData(countriesWithColors) : [];
-  const secondChartData = countriesWithColors?.length ? 
-                          (secondChartLabel !== "Immunization" ? getGdpChartData(countriesWithColors) : getImmuChartData(countriesWithColors)) 
-                          : [];
+  const secondChartData = countriesWithColors?.length
+    ? secondChartLabel !== "Immunization"
+      ? getGdpChartData(countriesWithColors)
+      : getImmuChartData(countriesWithColors)
+    : [];
 
   return (
     <div className="InfoPopup">
@@ -100,18 +101,42 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
           <Pill variant={PillVariant.female}>Women {femaleLifeExpectancy} years</Pill>
         </div>
       )}
-      {(countries?.length <= 1 && secondChartLabel !== "Immunization") && (
+      {countries?.length <= 1 && secondChartLabel !== "Immunization" && (
         <div className="InfoPopup__pills">
-          {lifeExpGdpCorrS >= 0.8 && <Pill variant={PillVariant.posTrend}>High Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})</Pill>}
-          {lifeExpGdpCorrS < 0.8 && lifeExpGdpCorrS > 0.5 && <Pill variant={PillVariant.custom}>Medium Correlation: P ({lifeExpGdpCorrP}) Sp {lifeExpGdpCorrS})</Pill>}
-          {lifeExpGdpCorrS < 0.5 && <Pill variant={PillVariant.negTrend}>Low Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})</Pill>}
+          {lifeExpGdpCorrS >= 0.8 && (
+            <Pill variant={PillVariant.posTrend}>
+              High Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})
+            </Pill>
+          )}
+          {lifeExpGdpCorrS < 0.8 && lifeExpGdpCorrS > 0.5 && (
+            <Pill variant={PillVariant.custom}>
+              Medium Correlation: P ({lifeExpGdpCorrP}) Sp {lifeExpGdpCorrS})
+            </Pill>
+          )}
+          {lifeExpGdpCorrS < 0.5 && (
+            <Pill variant={PillVariant.negTrend}>
+              Low Correlation: P ({lifeExpGdpCorrP}) Sp ({lifeExpGdpCorrS})
+            </Pill>
+          )}
         </div>
       )}
-      {(countries?.length <= 1 && secondChartLabel === "Immunization") && (
+      {countries?.length <= 1 && secondChartLabel === "Immunization" && (
         <div className="InfoPopup__pills">
-          {lifeExpImmuCorrS >= 0.8 && <Pill variant={PillVariant.posTrend}>High Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
-          {lifeExpImmuCorrS < 0.8 && lifeExpImmuCorrS > 0.5 && <Pill variant={PillVariant.custom}>Medium Correlation: P ({lifeExpImmuCorrP}) Sp {lifeExpImmuCorrS})</Pill>}
-          {lifeExpImmuCorrS < 0.5 && <Pill variant={PillVariant.negTrend}>Low Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})</Pill>}
+          {lifeExpImmuCorrS >= 0.8 && (
+            <Pill variant={PillVariant.posTrend}>
+              High Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})
+            </Pill>
+          )}
+          {lifeExpImmuCorrS < 0.8 && lifeExpImmuCorrS > 0.5 && (
+            <Pill variant={PillVariant.custom}>
+              Medium Correlation: P ({lifeExpImmuCorrP}) Sp {lifeExpImmuCorrS})
+            </Pill>
+          )}
+          {lifeExpImmuCorrS < 0.5 && (
+            <Pill variant={PillVariant.negTrend}>
+              Low Correlation: P ({lifeExpImmuCorrP}) Sp ({lifeExpImmuCorrS})
+            </Pill>
+          )}
         </div>
       )}
       <LineChart
@@ -154,7 +179,7 @@ const InfoPopup = ({ year, country, countries, onClose, firstChartLabel, secondC
             </div>
           )}
           {secondChartLabel === "Immunization" && (
-             <div className="InfoPopup__other">
+            <div className="InfoPopup__other">
               <h3 className="InfoPopup__subheading">Most Similar Countries</h3>
               Average Life Expectancy: {mostSimLifeExp}
               <br></br>

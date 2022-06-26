@@ -10,6 +10,7 @@ const MapLegend = ({ scale, label, onSwitchMetric }) => {
   return (
     // <LegendDemo title="Threshold">
     <div className="MapLegend">
+      <ToggleSwitch id="ground" checked={label !== "Immunization"} onChange={onSwitchMetric} />
       <h3 className="MapLegend__header">{label}</h3>
       <LegendLinear scale={scale}>
         {(labels) => (
@@ -22,7 +23,8 @@ const MapLegend = ({ scale, label, onSwitchMetric }) => {
                     <g>
                       <rect fill={label.value} x={0} y={0} width={width} height={legendGlyphHeight} />
                       <text x="50%" y="50%" className={"MapLegend__label"}>
-                        {Math.round(label.text)}{i === labels.length-1 ? '+' : ''}
+                        {Math.round(label.text)}
+                        {i === labels.length - 1 ? "+" : ""}
                       </text>
                     </g>
                   </svg>
@@ -32,7 +34,11 @@ const MapLegend = ({ scale, label, onSwitchMetric }) => {
           </div>
         )}
       </LegendLinear>
-      <ToggleSwitch id="ground" checked={ label !== "Immunization" } onChange={ onSwitchMetric }/>
+      <div className="MapLegend__lifeExpectancy">
+        The brightness and the height of bars
+        <br />
+        describes the average life expectancy.
+      </div>
     </div>
   );
 };

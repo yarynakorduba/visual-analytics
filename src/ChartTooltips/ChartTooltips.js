@@ -19,7 +19,7 @@ const xAxisTooltipStyles = {
   textAlign: "center",
   pointerEvents: "none",
   color: "white",
-  background: "#1B2021",
+  background: "#827397",
   transform: "translate(calc(-50% - 0.6rem), -0.5rem)",
 };
 
@@ -32,7 +32,7 @@ const yAxisTooltipStyles = {
   pointerEvents: "none",
   color: "white",
   transform: "translate(calc(-100% - 0.75rem), calc(-50% - 0.6rem))",
-  background: "#1B2021",
+  background: "#827397",
 };
 
 function TooltipDatumIndicator({ color }) {

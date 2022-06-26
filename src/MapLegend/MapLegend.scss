@@ -4,10 +4,10 @@
   background: rgba(255, 255, 255, 0.4);
   top: 0;
   right: 0;
-  padding: 0.25rem;
+  padding: 0.5rem;
 
   &__header {
-    margin: 0.25rem;
+    margin: 0.5rem 0.25rem;
     padding: 0;
     text-align: left;
     font-size: 0.875rem;
@@ -20,5 +20,12 @@
     font-size: 0.6rem;
     text-anchor: middle;
     dominant-baseline: middle;
+  }
+
+  &__lifeExpectancy {
+    font-size: 0.875rem;
+    width: inherit;
+    text-align: left;
+    padding: 0.5rem 0 0.25rem;
   }
 }
