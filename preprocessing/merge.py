@@ -268,24 +268,3 @@ json_output = json.dumps(resObject, indent = 4)
 # Writing to sample.json
 with open("./countryData.geojson", "w") as outfile:
     outfile.write(json_output)
-
-
-
-
-
-
-
-
-
-# not needed yet
-# # immunPred
-# diffArray = np.sqrt(np.abs(np.diff(np.array(x['immunDpt']))))
-# forecasterModel = ARIMA(diffArray, order=(6,1,0))
-# forecasterModelFit = forecasterModel.fit()
-# prediction = forecasterModelFit.predict(start=len(diffArray), end=len(diffArray)+9) # prediction for next 10 years
-# immunDptOld = np.array(x['immunDpt'])
-# immunDptOld = immunDptOld[immunDptOld >= 0]
-# if len(immunDptOld) != 0:
-#     immunDptPred = np.around(immunDptOld[-1] + np.sum(prediction), 2)
-# else:
-#     immunDptPred = -1
